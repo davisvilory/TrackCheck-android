@@ -161,6 +161,9 @@ public class VisitPending extends Fragment {
             BaseClass.ToastAlert("Enviando las visitas pendientes, por favor espere...", getContext());
 
             if (task == null) {
+
+                BaseClass.ToastAlert("Enviando las visitas pendientes, por favor espere...", getContext());
+
                 showProgress(true);
                 task = new Task(2);
                 task.execute((Void) null);
