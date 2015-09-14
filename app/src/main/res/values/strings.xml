@@ -1,0 +1,69 @@
+<resources>
+    <!--Menu-->
+    <string name="icon_agregar">Agregar</string>
+    <string name="icon_guardar">Guardar</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <string name="action_gps">GPS</string>
+    <string name="action_sync">Sync</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_exitapp">Exit App</string>
+    <string name="action_getcatalogs">Obtener Catalogos</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <!--Modulos-->
+    <string name="Nombre_Aplicacion">TrackCheck</string>
+    <string name="Modulo_Login">Login</string>
+    <string name="Modulo_Master">Inicio</string>
+    <string name="Modulo_Splash">Splash</string>
+
+    <!--Controles-->
+    <string name="Login_Usuario">Usuario</string>
+    <string name="Login_Contrasenia">Contraseña</string>
+    <string name="Login_Entrar">Entrar</string>
+    <string name="Login_CampoObligatorio">Este campo es obligatorio</string>
+    <string name="Login_DatosIncorrectos">El usuario y/o la contraseña son incorrectos</string>
+    <string name="Login_Logo_Descripcion">Logo</string>
+
+    <string name="NavDrawer_Logo_Descripcion">Logo</string>
+
+    <string name="FormVisitTitulo">Nueva Visita</string>
+    <string name="FormVisitBusiness">Negocio</string>
+    <string name="FormVisitTerritory">Territorio</string>
+    <string name="FormVisitZone">Zona</string>
+    <string name="FormVisitLatitud">Latitud</string>
+    <string name="FormVisitLongitud">Longitud</string>
+    <string name="FormVisitStreet">Calle</string>
+    <string name="FormVisitNumber">Numero</string>
+    <string name="FormVisitColony">Colonia</string>
+    <string name="FormVisitDelegationTown">Delegacion/Municipio</string>
+    <string name="FormVisitCity">Ciudad</string>
+    <string name="FormVisitState">Estado</string>
+    <string name="FormVisitPostalCode">Codigo Postal</string>
+    <string name="FormVisitPoster">Poster</string>
+    <string name="FormVisitThermoRoshpack60x40">ThermoRoshpack60x40</string>
+    <string name="FormVisitThermoTi2260x40">ThermoTi2260x40</string>
+    <string name="FormVisitElectroGota">ElectroGota</string>
+    <string name="FormVisitElectroImagen">ElectroImagen</string>
+    <string name="FormVisitBanderola">Banderola</string>
+    <string name="FormVisitCalcomanis">Calcomanis</string>
+    <string name="FormVisitCaballeteCambioAceite">CaballeteCambioAceite</string>
+    <string name="FormVisitCaballeteVentaAceite">CaballeteVentaAceite</string>
+    <string name="FormVisitLona2x1Roshpack">Lona2x1Roshpack</string>
+    <string name="FormVisitLona2x1ImagenMecanico">Lona2x1ImagenMecanico</string>
+    <string name="FormVisitObservaciones">Observaciones (Opcional)</string>
+    <string name="FormVisitCapturar">Cámara</string>
+    <string name="FormVisitGaleria">Galería</string>
+    <string name="FormVisitFotosCapturadas">Capturar evidencia</string>
+    <string name="FormVisitPreview">Imagen tomada</string>
+    <string name="FormVisitEnviar">Guardar visita</string>
+
+    <string name="VisitPendingNingunResultado">No hay visitas pendientes</string>
+    <string name="VisitPendingPorSincronizar">Visitas por sincronizar:</string>
+
+    <!--Mensajes-->
+    <string name="Mensaje_SinConeccion">Se requiere conección a Internet para actualizar</string>
+    <string name="Mensaje_ErrorInterno">Error interno de sistema</string>
+
+</resources>

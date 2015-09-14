@@ -1,0 +1,526 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+    <ProgressBar
+        android:id="@+id/FormVisitProgress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/FormVisitForm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/FormVisitTitulo"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textSizeTitle"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/FormVisitBusiness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/FormVisitBusiness"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/FormVisitStreet"
+            android:textColor="@color/white"
+            android:textColorHint="@color/pearl"
+            android:textSize="@dimen/textSize" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitTerritory"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitTerritory"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:nextFocusDown="@+id/FormVisitZone"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitZone"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitZone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:nextFocusDown="@+id/FormVisitStreet"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:paddingBottom="14sp"-->
+        <!--android:paddingTop="10sp">-->
+
+        <!--<TextView-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:paddingRight="4sp"-->
+        <!--android:paddingLeft="4sp"-->
+        <!--android:text="@string/FormVisitLatitud"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:textSize="@dimen/textSize" />-->
+
+        <!--<TextView-->
+        <!--android:id="@+id/FormVisitLatitud"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:textSize="@dimen/textSize" />-->
+        <!--</LinearLayout>-->
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:paddingBottom="14sp"-->
+        <!--android:paddingTop="10sp">-->
+
+        <!--<TextView-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:paddingRight="4sp"-->
+        <!--android:paddingLeft="4sp"-->
+        <!--android:text="@string/FormVisitLongitud"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:textSize="@dimen/textSize" />-->
+
+        <!--<TextView-->
+        <!--android:id="@+id/FormVisitLongitud"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:textSize="@dimen/textSize" />-->
+        <!--</LinearLayout>-->
+
+        <EditText
+            android:id="@+id/FormVisitStreet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/FormVisitStreet"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/FormVisitNumber"
+            android:textColor="@color/white"
+            android:textColorHint="@color/pearl"
+            android:textSize="@dimen/textSize" />
+
+        <EditText
+            android:id="@+id/FormVisitNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/FormVisitNumber"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/FormVisitColony"
+            android:textColor="@color/white"
+            android:textColorHint="@color/pearl"
+            android:textSize="@dimen/textSize" />
+
+        <EditText
+            android:id="@+id/FormVisitColony"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/FormVisitColony"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/FormVisitDelegationTown"
+            android:textColor="@color/white"
+            android:textColorHint="@color/pearl"
+            android:textSize="@dimen/textSize" />
+
+        <EditText
+            android:id="@+id/FormVisitDelegationTown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/FormVisitDelegationTown"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/FormVisitCity"
+            android:textColor="@color/white"
+            android:textColorHint="@color/pearl"
+            android:textSize="@dimen/textSize" />
+
+        <EditText
+            android:id="@+id/FormVisitCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/FormVisitCity"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/FormVisitState"
+            android:textColor="@color/white"
+            android:textColorHint="@color/pearl"
+            android:textSize="@dimen/textSize" />
+
+        <EditText
+            android:id="@+id/FormVisitState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/FormVisitState"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/FormVisitPostalCode"
+            android:textColor="@color/white"
+            android:textColorHint="@color/pearl"
+            android:textSize="@dimen/textSize" />
+
+        <EditText
+            android:id="@+id/FormVisitPostalCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/FormVisitPostalCode"
+            android:imeOptions="actionNone"
+            android:nextFocusDown="@+id/FormVisitPoster"
+            android:textColor="@color/white"
+            android:textColorHint="@color/pearl"
+            android:textSize="@dimen/textSize" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitPoster"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitPoster"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitThermoRoshpack60x40"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitThermoRoshpack60x40"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitThermoRoshpack60x40"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitThermoTi2260x40"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitThermoTi2260x40"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitThermoTi2260x40"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitElectroGota"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitElectroGota"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitElectroGota"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitElectroImagen"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitElectroImagen"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitElectroImagen"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitBanderola"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitBanderola"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitBanderola"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitCalcomanis"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitCalcomanis"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitCalcomanis"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitCaballeteCambioAceite"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitCaballeteCambioAceite"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitCaballeteCambioAceite"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitCaballeteVentaAceite"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitCaballeteVentaAceite"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitCaballeteVentaAceite"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitLona2x1Roshpack"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitLona2x1Roshpack"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitLona2x1Roshpack"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:nextFocusDown="@+id/FormVisitLona2x1ImagenMecanico"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10sp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:paddingLeft="4sp"
+                android:paddingRight="4sp"
+                android:text="@string/FormVisitLona2x1ImagenMecanico"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSize" />
+
+            <Spinner
+                android:id="@+id/FormVisitLona2x1ImagenMecanico"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:popupBackground="@color/colorPrimary" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:text="@string/FormVisitFotosCapturadas"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textSize" />
+
+        <Button
+            android:id="@+id/FormVisitCapturar"
+            style="?android:textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/FormVisitCapturar"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/FormVisitGaleria"
+            style="?android:textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/FormVisitGaleria"
+            android:textStyle="bold" />
+
+        <beteam.viloco.trackcheck.adapter.ExpandableHeightListView
+            android:id="@+id/FormVisitPhotos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="false" />
+
+        <Button
+            android:id="@+id/FormVisitEnviar"
+            style="?android:textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/FormVisitEnviar"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>

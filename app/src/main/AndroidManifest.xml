@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="beteam.viloco.trackcheck">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:fullBackupContent="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/Nombre_Aplicacion"
+        android:theme="@style/MyMaterialTheme">
+        <activity
+            android:name="beteam.viloco.trackcheck.activity.Splash"
+            android:label="@string/Modulo_Splash"
+            android:screenOrientation="portrait">
+            <intent-filter android:label="@string/Nombre_Aplicacion">
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="beteam.viloco.trackcheck.activity.Login"
+            android:label="@string/Modulo_Login"
+            android:windowSoftInputMode="stateUnspecified|adjustPan" />
+        <activity
+            android:name="beteam.viloco.trackcheck.activity.Master"
+            android:label="@string/Modulo_Master" />
+    </application>
+
+</manifest>

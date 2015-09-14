@@ -1,0 +1,7 @@
+<resources>
+    <dimen name="activity_horizontal_margin">20dp</dimen>
+    <dimen name="activity_vertical_margin">20dp</dimen>
+    <dimen name="nav_drawer_width">340dp</dimen>
+    <dimen name="textSize">25sp</dimen>
+    <dimen name="textSizeTitle">35sp</dimen>
+</resources>
