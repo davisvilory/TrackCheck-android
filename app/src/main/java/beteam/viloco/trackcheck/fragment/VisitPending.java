@@ -46,6 +46,7 @@ public class VisitPending extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        new CatalogoServicio(getContext());
     }
 
     @Override
@@ -161,9 +162,6 @@ public class VisitPending extends Fragment {
             BaseClass.ToastAlert("Enviando las visitas pendientes, por favor espere...", getContext());
 
             if (task == null) {
-
-                BaseClass.ToastAlert("Enviando las visitas pendientes, por favor espere...", getContext());
-
                 showProgress(true);
                 task = new Task(2);
                 task.execute((Void) null);
@@ -183,13 +181,12 @@ public class VisitPending extends Fragment {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            CatalogoServicio catalogoServicio = new CatalogoServicio(getContext());
-
             try {
                 if (accion == 1)
-                    listVisitas = catalogoServicio.ReadAllData();
-                else if (accion == 2)
-                    catalogoServicio.SendVisitasPendientes();
+                    listVisitas = CatalogoServicio.getInstance().ReadAllData();
+                else if (accion == 2) {
+                    CatalogoServicio.getInstance().SendVisitasPendientes();
+                }
             } catch (CustomException ex) {
                 BaseClass.ToastAlert(ex.getMessage(), getContext());
             } catch (Exception ex) {

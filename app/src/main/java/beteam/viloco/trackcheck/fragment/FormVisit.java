@@ -46,6 +46,7 @@ import beteam.viloco.trackcheck.dto.TerritoryDTO;
 import beteam.viloco.trackcheck.dto.ZoneDTO;
 import beteam.viloco.trackcheck.repositorios.LogErrorRepositorio;
 import beteam.viloco.trackcheck.servicio.CatalogoServicio;
+import beteam.viloco.trackcheck.util.CustomException;
 import beteam.viloco.trackcheck.util.Extensions;
 import beteam.viloco.trackcheck.util.GPSTracker;
 
@@ -61,7 +62,6 @@ public class FormVisit extends Fragment {
     private PhotosListViewAdapter photosAdapter;
     private ExpandableHeightListView listView;
     private Boolean isLocationServicesActive = false;
-    private CatalogoServicio catalogoServicio;
 
     public FormVisit() {
     }
@@ -70,6 +70,7 @@ public class FormVisit extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        new CatalogoServicio(getContext());
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -115,9 +116,8 @@ public class FormVisit extends Fragment {
             });
 
             List<SpinnerCustom> list = new ArrayList<>();
-            catalogoServicio = new CatalogoServicio(getContext());
 
-            List<TerritoryDTO> territoryDTOList = catalogoServicio.ReadAllTerritory();
+            List<TerritoryDTO> territoryDTOList = CatalogoServicio.getInstance().ReadAllTerritory();
             for (int i = 0; i < territoryDTOList.size(); i++) {
                 TerritoryDTO territoryDTO = territoryDTOList.get(i);
                 list.add(new SpinnerCustom(territoryDTO.Id, territoryDTO.Name));
@@ -126,7 +126,7 @@ public class FormVisit extends Fragment {
             ((Spinner) formVisit.findViewById(R.id.FormVisitTerritory)).setAdapter(new SpinnerAdapter(getContext(), list));
 
             list = new ArrayList<>();
-            List<ZoneDTO> zoneDTOList = catalogoServicio.ReadAllZone();
+            List<ZoneDTO> zoneDTOList = CatalogoServicio.getInstance().ReadAllZone();
             for (int i = 0; i < zoneDTOList.size(); i++) {
                 ZoneDTO zoneDTO = zoneDTOList.get(i);
                 list.add(new SpinnerCustom(zoneDTO.Id, zoneDTO.Name));
@@ -151,8 +151,8 @@ public class FormVisit extends Fragment {
             ((Spinner) formVisit.findViewById(R.id.FormVisitLona2x1ImagenMecanico)).setAdapter(new SpinnerAdapter(getContext(), list));
 
             CheckSources();
-            //} catch (CustomException ex) {
-            //    BaseClass.ToastAlert(ex.getMessage(), getContext());
+        } catch (CustomException ex) {
+            BaseClass.ToastAlert(ex.getMessage(), getContext());
         } catch (Exception ex) {
             LogErrorRepositorio.ArmaLogError(ex, getContext());
             BaseClass.ToastAlert("Error interno de sistema", getContext());
@@ -164,13 +164,6 @@ public class FormVisit extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-//        try {
-//            CheckSources();
-//        } catch (Exception ex) {
-//            LogErrorRepositorio.ArmaLogError(ex, getContext());
-//            BaseClass.ToastAlert("Error interno de sistema", getContext());
-//        }
     }
 
     @Override
@@ -351,8 +344,6 @@ public class FormVisit extends Fragment {
                     }
                     break;
             }
-            //        } catch (CustomException ex) {
-//            BaseClass.ToastAlert(ex.getMessage(), getContext());
         } catch (Exception ex) {
             LogErrorRepositorio.ArmaLogError(ex, getContext());
             BaseClass.ToastAlert("Error interno de sistema", getContext());
@@ -570,10 +561,9 @@ public class FormVisit extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                enviado = catalogoServicio.InsertaData(dataDTO);
-                //BaseClass.ClearForm((ViewGroup) mFormView);
-                //} catch (CustomException ex) {
-                //    BaseClass.ToastAlert(ex.getMessage(), getContext());
+                enviado = CatalogoServicio.getInstance().InsertaData(dataDTO);
+            } catch (CustomException ex) {
+                BaseClass.ToastAlert(ex.getMessage(), getContext());
             } catch (Exception ex) {
                 LogErrorRepositorio.ArmaLogError(ex, getContext());
                 BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), getContext());

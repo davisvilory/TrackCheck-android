@@ -20,27 +20,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CatalogoServicio {
-    private Context context;
+    private static Context mContext;
+    private static CatalogoServicio instance;
 
     public CatalogoServicio(Context context) {
-        this.context = context;
+        mContext = context;
+        if (instance == null) instance = this;
     }
 
-    /***
-     * User
-     ***/
-    public UserDTO ObtieneUnicoUserAutenticado() throws CustomException{
-        UserRepositorio repo = new UserRepositorio(context);
+    public static CatalogoServicio getInstance() {
+        return instance;
+    }
+
+    /*User*/
+    public UserDTO ObtieneUnicoUserAutenticado() throws CustomException {
+        UserRepositorio repo = new UserRepositorio(mContext);
         return repo.ObtieneUnicoUserAutenticado();
     }
 
-    public boolean InsertaUnicoUserAutenticado(UserDTO user) throws CustomException{
-        UserRepositorio repo = new UserRepositorio(context);
+    public boolean InsertaUnicoUserAutenticado(UserDTO user) throws CustomException {
+        UserRepositorio repo = new UserRepositorio(mContext);
         return repo.InsertaUnicoUserAutenticado(user);
     }
 
-    public boolean BorraUnicoUserAutenticado(int Id) throws CustomException{
-        UserRepositorio repo = new UserRepositorio(context);
+    public boolean BorraUnicoUserAutenticado(int Id) throws CustomException {
+        UserRepositorio repo = new UserRepositorio(mContext);
         return repo.BorraUnicoUserAutenticado(Id);
     }
 
@@ -67,11 +71,9 @@ public class CatalogoServicio {
         return list;
     }
 
-    /***
-     * Data
-     ***/
+    /*Data*/
     public boolean InsertaData(DataDTO dataDTO) throws CustomException {
-        DataRepositorio repo = new DataRepositorio(context);
+        DataRepositorio repo = new DataRepositorio(mContext);
 
         for (int i = 0; i < dataDTO.DataPhoto.size(); i++) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -83,38 +85,44 @@ public class CatalogoServicio {
     }
 
     public List<DataDTO> ReadAllData() throws CustomException {
-        DataRepositorio repo = new DataRepositorio(context);
+        DataRepositorio repo = new DataRepositorio(mContext);
         return repo.ReadAllByPredicate(null);
     }
 
     public void SendVisitasPendientes() throws CustomException {
-        DataRepositorio repo = new DataRepositorio(context);
+        DataRepositorio repo = new DataRepositorio(mContext);
         repo.SendVisitasPendientes();
     }
 
-    public boolean ExisteTerritories() throws CustomException{
-        TerritoryRepositorio territoryRepositorio = new TerritoryRepositorio(context);
+    /*Territory*/
+    public boolean ExisteTerritories() throws CustomException {
+        TerritoryRepositorio territoryRepositorio = new TerritoryRepositorio(mContext);
         return territoryRepositorio.ExisteTerritories();
     }
+
     public List<TerritoryDTO> ReadAllTerritory() throws CustomException {
-        TerritoryRepositorio repo = new TerritoryRepositorio(context);
+        TerritoryRepositorio repo = new TerritoryRepositorio(mContext);
         return repo.ReadAllByPredicate(null);
     }
+
     public boolean ObtieneTerritories() throws CustomException {
-        TerritoryRepositorio repo = new TerritoryRepositorio(context);
+        TerritoryRepositorio repo = new TerritoryRepositorio(mContext);
         return repo.ObtieneTerritories();
     }
 
-    public boolean ExisteZones() throws CustomException{
-        ZoneRepositorio zoneRepositorio = new ZoneRepositorio(context);
+    /*Zone*/
+    public boolean ExisteZones() throws CustomException {
+        ZoneRepositorio zoneRepositorio = new ZoneRepositorio(mContext);
         return zoneRepositorio.ExisteZones();
     }
+
     public List<ZoneDTO> ReadAllZone() throws CustomException {
-        ZoneRepositorio repo = new ZoneRepositorio(context);
+        ZoneRepositorio repo = new ZoneRepositorio(mContext);
         return repo.ReadAllByPredicate(null);
     }
+
     public boolean ObtieneZones() throws CustomException {
-        ZoneRepositorio repo = new ZoneRepositorio(context);
+        ZoneRepositorio repo = new ZoneRepositorio(mContext);
         return repo.ObtieneZones();
     }
 }
