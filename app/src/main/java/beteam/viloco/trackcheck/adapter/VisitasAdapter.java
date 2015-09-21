@@ -59,8 +59,7 @@ public class VisitasAdapter extends BaseAdapter {
 
         ((TextView) template.findViewById(R.id.VisitasBusiness)).setText(String.valueOf(item.BusinessName));
         ((TextView) template.findViewById(R.id.VisitasStreet)).setText(String.valueOf(item.Street));
-        ((TextView) template.findViewById(R.id.VisitasLatitud)).setText(String.valueOf(item.Latitude));
-        ((TextView) template.findViewById(R.id.VisitasLongitud)).setText(String.valueOf(item.Longitude));
+        ((TextView) template.findViewById(R.id.VisitasFotosTotal)).setText(String.valueOf(item.DataPhotoCount));
 
         return template;
     }

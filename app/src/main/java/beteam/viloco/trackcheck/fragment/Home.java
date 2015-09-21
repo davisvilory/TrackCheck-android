@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -16,19 +17,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 import beteam.viloco.trackcheck.R;
 import beteam.viloco.trackcheck.activity.BaseClass;
 import beteam.viloco.trackcheck.activity.Login;
-import beteam.viloco.trackcheck.repositorios.LogErrorRepositorio;
+import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.servicio.CatalogoServicio;
 import beteam.viloco.trackcheck.util.CustomException;
 
 public class Home extends Fragment {
-    Context context;
-    private Task task = null;
-    private View mProgressView;
-    private View mFormView;
-    private int mAction = 0;
+    Context mContext;
+    Task mTask = null;
+    View mProgressView;
+    View mFormView;
+    ArrayList<Integer> mAction;
 
     public Home() {
 
@@ -38,7 +41,8 @@ public class Home extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        context = getContext();
+        new CatalogoServicio(getContext());
+        mContext = getContext();
     }
 
     @Override
@@ -48,27 +52,25 @@ public class Home extends Fragment {
         try {
             mFormView = view.findViewById(R.id.HomeForm);
             mProgressView = view.findViewById(R.id.HomeProgress);
+            mAction = new ArrayList<>();
 
-            CatalogoServicio catalogoServicio = new CatalogoServicio(context);
-            if (!catalogoServicio.ExisteZones()) {
-                DoAction(1, "Obteniendo catalogo de Zonas");
+            if (!CatalogoServicio.getInstance().ExistsZones()) {
+                DoAction(1);
             }
-            if (!catalogoServicio.ExisteTerritories()) {
-                DoAction(2, "Obteniendo catalogo de Territorios");
+            if (!CatalogoServicio.getInstance().ExistsTerritories()) {
+                DoAction(2);
+            }
+            if (!CatalogoServicio.getInstance().ExistsBusinessTypes()) {
+                DoAction(3);
             }
         } catch (CustomException ex) {
-            BaseClass.ToastAlert(ex.getMessage(), context);
+            BaseClass.ToastAlert(ex.getMessage(), mContext);
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, context);
-            BaseClass.ToastAlert("Error interno de sistema", context);
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
 
         return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -80,42 +82,40 @@ public class Home extends Fragment {
         menu.findItem(R.id.action_gps).setVisible(false);
         menu.findItem(R.id.action_sync).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
-        menu.findItem(R.id.action_exitapp).setVisible(true);
         menu.findItem(R.id.action_getcatalogs).setVisible(true);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
-            CatalogoServicio catalogoServicio = new CatalogoServicio(context);
-
             switch (item.getItemId()) {
-                case R.id.action_settings:
-                    return false;
-                case R.id.action_search:
-                    return false;
-                case R.id.action_gps:
-                    return false;
-                case R.id.action_sync:
-                    return false;
-                case R.id.action_refresh:
-                    return false;
-                case R.id.action_exitapp:
-                    catalogoServicio.BorraUnicoUserAutenticado(BaseClass.usuarioLogged.Id);
-                    BaseClass.usuarioLogged = null;
-                    startActivity(new Intent(getActivity(), Login.class));
-                    getActivity().finish();
-                    return true;
+//                case R.id.action_exitapp:
+//                    BaseClass.ShowConfirm("Confirmación", "¿Desea cerrar sesión?", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            try {
+//                                CatalogoServicio.getInstance().DeleteUserAuthenticated(BaseClass.usuarioLogged.Id);
+//                                BaseClass.usuarioLogged = null;
+//                                startActivity(new Intent(getActivity(), Login.class));
+//                                getActivity().finish();
+//                            } catch (CustomException ex) {
+//                                BaseClass.ToastAlert(ex.getMessage(), mContext);
+//                            } catch (Exception ex) {
+//                                LogErrorRepository.BuildLogError(ex, mContext);
+//                                BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
+//                            }
+//                        }
+//                    }, getContext());
+//                    return true;
                 case R.id.action_getcatalogs:
-                    DoAction(1, "Obteniendo catalogo de Zonas");
-                    DoAction(2, "Obteniendo catalogo de Territorios");
+                    DoAction(1);
+                    DoAction(2);
+                    DoAction(3);
                     return true;
             }
-        } catch (CustomException ex) {
-            BaseClass.ToastAlert(ex.getMessage(), context);
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, context);
-            BaseClass.ToastAlert("Error interno de sistema", context);
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
 
         return false;
@@ -154,18 +154,24 @@ public class Home extends Fragment {
         }
     }
 
-    private void DoAction(int action, String message) {
-        mAction = action;
-        if (task == null) {
-            BaseClass.ToastAlert(message, context);
+    private void DoAction(int action) {
+        if (!mAction.contains(action))
+            mAction.add(action);
+        String message = "";
+        if (mTask == null) {
+            if (action == 1) message = "Obteniendo catalogo de Zonas";
+            else if (action == 2) message = "Obteniendo catalogo de Territorios";
+            else if (action == 3) message = "Obteniendo catalogo de Tipos de Negocio";
+            BaseClass.ToastAlert(message, mContext);
             showProgress(true);
-            task = new Task(action);
-            task.execute((Void) null);
+            mTask = new Task(action);
+            mTask.execute((Void) null);
         }
     }
 
     public class Task extends AsyncTask<Void, Void, Boolean> {
         int accion = 0;
+        String message;
 
         Task(int accion) {
             this.accion = accion;
@@ -173,23 +179,21 @@ public class Home extends Fragment {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            CatalogoServicio catalogoServicio = new CatalogoServicio(context);
-
             try {
+                mAction.remove((Integer) accion);
                 if (accion == 1) {
-                    if (mAction == 1)
-                        mAction = 0;
-                    catalogoServicio.ObtieneZones();
+                    CatalogoServicio.getInstance().GetZones();
                 } else if (accion == 2) {
-                    if (mAction == 2)
-                        mAction = 0;
-                    catalogoServicio.ObtieneTerritories();
+                    CatalogoServicio.getInstance().GetTerritories();
+                } else if (accion == 3) {
+                    CatalogoServicio.getInstance().GetBusinessTypes();
                 }
             } catch (CustomException ex) {
-                BaseClass.ToastAlert(ex.getMessage(), context);
+                message = ex.getMessage();
+                return false;
             } catch (Exception ex) {
-                LogErrorRepositorio.ArmaLogError(ex, context);
-                BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), context);
+                LogErrorRepository.BuildLogError(ex, mContext);
+                message = getString(R.string.Mensaje_ErrorInterno);
                 return false;
             }
 
@@ -198,30 +202,33 @@ public class Home extends Fragment {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            task = null;
+            mTask = null;
             showProgress(false);
 
             try {
-                if (accion == 1) {
-                    BaseClass.ToastAlert("Zonas obtenidas exitosamente", context);
-                    if (mAction == 2) {
-                        DoAction(mAction, "Obteniendo catalogo de Territorios");
+                if (success) {
+                    if (accion == 1) {
+                        BaseClass.ToastAlert("Zonas obtenidas exitosamente", mContext);
+                    } else if (accion == 2) {
+                        BaseClass.ToastAlert("Territorios obtenidos exitosamente", mContext);
+                    } else if (accion == 3) {
+                        BaseClass.ToastAlert("Tipos de Negocios obtenidos exitosamente", mContext);
                     }
-                } else if (accion == 2) {
-                    BaseClass.ToastAlert("Territorios obtenidos exitosamente", context);
-                    if (mAction == 1) {
-                        DoAction(mAction, "Obteniendo catalogo de Zonas");
-                    }
+                } else {
+                    BaseClass.ToastAlert(message, mContext);
+                }
+                if (mAction.size() > 0) {
+                    DoAction(mAction.get(0));
                 }
             } catch (Exception ex) {
-                LogErrorRepositorio.ArmaLogError(ex, context);
-                BaseClass.ToastAlert("Error interno de sistema", context);
+                LogErrorRepository.BuildLogError(ex, mContext);
+                BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
             }
         }
 
         @Override
         protected void onCancelled() {
-            task = null;
+            mTask = null;
             showProgress(false);
         }
     }

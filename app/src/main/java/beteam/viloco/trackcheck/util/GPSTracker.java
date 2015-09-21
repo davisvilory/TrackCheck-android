@@ -14,7 +14,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 
 import beteam.viloco.trackcheck.activity.BaseClass;
-import beteam.viloco.trackcheck.repositorios.LogErrorRepositorio;
+import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 
 public class GPSTracker extends Service implements LocationListener {
 
@@ -56,18 +56,18 @@ public class GPSTracker extends Service implements LocationListener {
             if (!isGPSEnabled && !isNetworkEnabled) {
                 // no network provider is enabled
             } else {
-                //if (isNetworkEnabled) {
-                locationManager.requestLocationUpdates(proname, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                if (locationManager != null) {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    if (location != null) {
-                        latitude = location.getLatitude();
-                        longitude = location.getLongitude();
-                        canGetLocation = true;
-                    }
-                }
-                //}
-                if (isGPSEnabled) {
+//                if (isNetworkEnabled) {
+//                    locationManager.requestLocationUpdates(proname, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+//                    if (locationManager != null) {
+//                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//                        if (location != null) {
+//                            latitude = location.getLatitude();
+//                            longitude = location.getLongitude();
+//                            canGetLocation = true;
+//                        }
+//                    }
+//                }
+//                if (isGPSEnabled) {
                     locationManager.requestLocationUpdates(proname, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(proname);
@@ -77,10 +77,10 @@ public class GPSTracker extends Service implements LocationListener {
                             canGetLocation = true;
                         }
                     }
-                }
+//                }
             }
         } catch (SecurityException ex) {
-            LogErrorRepositorio.ArmaLogError(ex, mContext);
+            LogErrorRepository.BuildLogError(ex, mContext);
             BaseClass.ToastAlert("No se han proporcionado los accesos necesarios", mContext);
         }
 
@@ -93,7 +93,7 @@ public class GPSTracker extends Service implements LocationListener {
                 locationManager.removeUpdates(GPSTracker.this);
             }
         } catch (SecurityException ex) {
-            LogErrorRepositorio.ArmaLogError(ex, mContext);
+            LogErrorRepository.BuildLogError(ex, mContext);
             BaseClass.ToastAlert("No se han proporcionado los accesos necesarios", mContext);
         }
     }

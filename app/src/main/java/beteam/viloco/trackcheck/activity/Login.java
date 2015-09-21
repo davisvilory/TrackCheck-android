@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
@@ -23,24 +24,27 @@ import android.widget.TextView;
 
 import beteam.viloco.trackcheck.R;
 import beteam.viloco.trackcheck.dto.UserDTO;
-import beteam.viloco.trackcheck.repositorios.LogErrorRepositorio;
+import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.servicio.CatalogoServicio;
 import beteam.viloco.trackcheck.servicio.NegocioServicio;
 import beteam.viloco.trackcheck.util.CustomException;
 import beteam.viloco.trackcheck.util.Extensions;
 
 public class Login extends AppCompatActivity {
-    private UserLoginTask task = null;
-    private EditText txtUsuario;
-    private EditText txtPassword;
-    private View mProgressView;
-    private View mFormView;
-    private Boolean isCookie = false;
+    Context mContext;
+    UserLoginTask task = null;
+    EditText txtUsuario;
+    EditText txtPassword;
+    View mProgressView;
+    View mFormView;
+    Boolean isCookie = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        mContext = getBaseContext();
+        new CatalogoServicio(mContext);
 
         try {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -73,19 +77,18 @@ public class Login extends AppCompatActivity {
             mFormView = findViewById(R.id.Login_Form);
             mProgressView = findViewById(R.id.Login_Progress);
 
-            CatalogoServicio catalogoServicio = new CatalogoServicio(getBaseContext());
-            UserDTO user = catalogoServicio.ObtieneUnicoUserAutenticado();
+            UserDTO user = CatalogoServicio.getInstance().GetUserAuthenticated();
             if (user != null) {
                 isCookie = true;
                 showProgress(true);
                 task = new UserLoginTask(user, this);
                 task.execute((Void) null);
             }
-//        } catch (CustomException ex) {
-//            BaseClass.ToastAlert(ex.getMessage(), getBaseContext());
+        } catch (CustomException ex) {
+            BaseClass.ToastAlert(ex.getMessage(), mContext);
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getBaseContext());
-            BaseClass.ToastAlert("Error interno de sistema", getBaseContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
     }
 
@@ -125,7 +128,6 @@ public class Login extends AppCompatActivity {
         menu.findItem(R.id.action_gps).setVisible(false);
         menu.findItem(R.id.action_sync).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
-        menu.findItem(R.id.action_exitapp).setVisible(false);
         menu.findItem(R.id.action_getcatalogs).setVisible(false);
         return true;
     }
@@ -161,8 +163,8 @@ public class Login extends AppCompatActivity {
             cancel = true;
         }
 
-        if (!Extensions.isConnectionAvailable(getBaseContext())) {
-            BaseClass.ToastAlert(getString(R.string.Mensaje_SinConeccion), getBaseContext());
+        if (!Extensions.isConnectionAvailable(mContext)) {
+            BaseClass.ToastAlert(getString(R.string.Mensaje_SinConeccion), mContext);
             focusView = txtPassword;
             cancel = true;
         }
@@ -180,8 +182,9 @@ public class Login extends AppCompatActivity {
     }
 
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-        private UserDTO user;
-        private Activity activity;
+        UserDTO user;
+        Activity activity;
+        String message;
 
         UserLoginTask(UserDTO user, Activity activity) {
             this.user = user;
@@ -190,30 +193,29 @@ public class Login extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            NegocioServicio negocioServicio = new NegocioServicio(getBaseContext());
+            new NegocioServicio(mContext);
 
-            boolean isauth = false;
             try {
                 if (!isCookie) {
-                    user = negocioServicio.AutenticaUsuario(user);
+                    user = NegocioServicio.getInstance().AutenticaUsuario(user);
                 }
                 if (user.Id != 0) {
-                    isauth = true;
                     BaseClass.usuarioLogged = user;
                     if (!isCookie) {
-                        CatalogoServicio catalogoServicio = new CatalogoServicio(getBaseContext());
-                        catalogoServicio.InsertaUnicoUserAutenticado(user);
+                        CatalogoServicio.getInstance().InsertUserAuthenticated(user);
                     }
+                    return true;
                 }
             } catch (CustomException ex) {
-                BaseClass.ToastAlert(ex.getMessage(), getBaseContext());
+                message = ex.getMessage();
+                return false;
             } catch (Exception ex) {
-                LogErrorRepositorio.ArmaLogError(ex, getBaseContext());
-                BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), getBaseContext());
+                LogErrorRepository.BuildLogError(ex, mContext);
+                message = getString(R.string.Mensaje_ErrorInterno);
                 return false;
             }
 
-            return isauth;
+            return false;
         }
 
         @Override
@@ -225,6 +227,7 @@ public class Login extends AppCompatActivity {
                 activity.startActivity(new Intent(activity, Master.class));
                 activity.finish();
             } else {
+                BaseClass.ToastAlert(message, mContext);
                 txtPassword.setError(getString(R.string.Login_DatosIncorrectos));
                 txtPassword.requestFocus();
             }

@@ -8,7 +8,11 @@ import beteam.viloco.trackcheck.dto.Constantes;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String CREATE_TABLE_AUTENTICADO = "CREATE TABLE IF NOT EXISTS AUTENTICADO (" +
+    //TODO No borrar
+    public static final String Autenticado = "Autenticado";
+
+    //TODO No borrar
+    public static final String CREATE_TABLE_AUTENTICADO = "CREATE TABLE IF NOT EXISTS Autenticado (" +
             "Id INTEGER PRIMARY KEY," +
             "IdUserType INT NOT NULL," +
             "UserName TEXT NOT NULL," +
@@ -17,11 +21,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "MiddleName TEXT NOT NULL," +
             "Password TEXT NOT NULL)";
 
+    public static final String BusinessType = "BusinessType";
+
+    public static final String CREATE_TABLE_BUSINESSTYPE = "CREATE TABLE IF NOT EXISTS BusinessType (" +
+            "Id INTEGER PRIMARY KEY," + //TODO Recordar siempre quitar AUTOINCREMENT por ser catalogo
+            "Name TEXT NOT NULL," +
+            "Description TEXT NOT NULL)";
+
+    public static final String Data = "Data";
+
     public static final String CREATE_TABLE_DATA = "CREATE TABLE IF NOT EXISTS Data (" +
             "Id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "IdUser INT NOT NULL," +
             "IdTerritory INT NOT NULL," +
             "IdZone INT NOT NULL," +
+            "IdBusinessType INT NOT NULL," +
+            "SerialNumber TEXT NOT NULL," +
             "BusinessName TEXT NOT NULL," +
             "Latitude REAL NOT NULL," +
             "Longitude REAL NOT NULL," +
@@ -43,12 +58,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CaballeteVentaAceite INT NOT NULL," +
             "Lona2x1Roshpack INT NOT NULL," +
             "Lona2x1ImagenMecanico INT NOT NULL," +
-            "Date INT NOT NULL)";
+            "Date INT NOT NULL," +
+            "IdServer INT NULL)"; //TODO Recordar no borrar
+
+    public static final String DataPhoto = "DataPhoto";
 
     public static final String CREATE_TABLE_DATAPHOTO = "CREATE TABLE IF NOT EXISTS DataPhoto (" +
             "Id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "IdData INT NOT NULL," +
-            "Photo TEXT NOT NULL)";
+            "Photo TEXT NOT NULL," +
+            "IdServer INT NULL)"; //TODO Recordar no borrar
+
+    public static final String LogError = "LogError";
 
     public static final String CREATE_TABLE_LOGERROR = "CREATE TABLE IF NOT EXISTS LogError (" +
             "IDLogError INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -57,10 +78,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "ErrorInterno TEXT NOT NULL," +
             "Fecha INT NOT NULL)";
 
+    public static final String Territory = "Territory";
+
     public static final String CREATE_TABLE_TERRITORY = "CREATE TABLE IF NOT EXISTS Territory (" +
-            "Id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "Id INTEGER PRIMARY KEY," + //TODO Recordar siempre quitar AUTOINCREMENT por ser catalogo
             "Name TEXT NOT NULL," +
             "Description TEXT NOT NULL)";
+
+    public static final String User = "User";
 
     public static final String CREATE_TABLE_USER = "CREATE TABLE IF NOT EXISTS User (" +
             "Id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -71,13 +96,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "MiddleName TEXT NOT NULL," +
             "Password TEXT NOT NULL)";
 
+    public static final String UserType = "UserType";
+
     public static final String CREATE_TABLE_USERTYPE = "CREATE TABLE IF NOT EXISTS UserType (" +
             "Id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "Name TEXT NOT NULL," +
             "Description TEXT NOT NULL)";
 
+    public static final String Zone = "Zone";
+
     public static final String CREATE_TABLE_ZONE = "CREATE TABLE IF NOT EXISTS Zone (" +
-            "Id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "Id INTEGER PRIMARY KEY," + //TODO Recordar siempre quitar AUTOINCREMENT por ser catalogo
             "Name TEXT NOT NULL," +
             "Description TEXT NOT NULL)";
 
@@ -88,6 +117,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_AUTENTICADO);
+        db.execSQL(CREATE_TABLE_BUSINESSTYPE);
         db.execSQL(CREATE_TABLE_DATA);
         db.execSQL(CREATE_TABLE_DATAPHOTO);
         db.execSQL(CREATE_TABLE_LOGERROR);
@@ -100,6 +130,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         BackUpDB("AUTENTICADO", db);
+        BackUpDB("BUSINESSTYPE", db);
         BackUpDB("DATA", db);
         BackUpDB("DATAPHOTO", db);
         BackUpDB("LOGERROR", db);
@@ -112,7 +143,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void BackUpDB(String TableName, SQLiteDatabase db) {
         switch (TableName) {
-            case "AUTENTICADO":
+            case "BUSINESSTYPE":
                 break;
             case "DATA":
                 break;

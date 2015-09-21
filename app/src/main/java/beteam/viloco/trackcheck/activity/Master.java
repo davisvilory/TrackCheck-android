@@ -1,5 +1,7 @@
 package beteam.viloco.trackcheck.activity;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -14,26 +16,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import java.util.List;
-
 import beteam.viloco.trackcheck.R;
 import beteam.viloco.trackcheck.dto.ModulosDTO;
 import beteam.viloco.trackcheck.fragment.FormVisit;
 import beteam.viloco.trackcheck.fragment.FragmentDrawer;
 import beteam.viloco.trackcheck.fragment.Home;
 import beteam.viloco.trackcheck.fragment.VisitPending;
-import beteam.viloco.trackcheck.repositorios.LogErrorRepositorio;
+import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.servicio.CatalogoServicio;
 import beteam.viloco.trackcheck.util.CustomException;
 
 public class Master extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
     protected FrameLayout frameLayout;
     FragmentDrawer drawerFragment;
+    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_master);
+        mContext = getBaseContext();
+        new CatalogoServicio(mContext);
 
         try {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -56,18 +59,16 @@ public class Master extends AppCompatActivity implements FragmentDrawer.Fragment
                         getSupportActionBar().setTitle(fragment.getTag());
                     } else { // no hay mas fragments
                         getSupportActionBar().setTitle(R.string.Nombre_Aplicacion);
-                        BaseClass.ToastAlert("Utilice \"Back\" una vez más para salir de la aplicación", getBaseContext());
+                        BaseClass.ToastAlert("Utilice \"Back\" una vez más para salir de la aplicación", mContext);
                     }
                 }
             });
 
             frameLayout = (FrameLayout) findViewById(R.id.container_body);
             displayView(drawerFragment.getItem(0));
-//        } catch (CustomException ex) {
-//            BaseClass.ToastAlert(ex.getMessage(), getBaseContext());
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getBaseContext());
-            BaseClass.ToastAlert("Error interno de sistema", getBaseContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
     }
 
@@ -79,7 +80,6 @@ public class Master extends AppCompatActivity implements FragmentDrawer.Fragment
         menu.findItem(R.id.action_gps).setVisible(false);
         menu.findItem(R.id.action_sync).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
-        menu.findItem(R.id.action_exitapp).setVisible(false);
         menu.findItem(R.id.action_getcatalogs).setVisible(false);
         return true;
     }
@@ -133,11 +133,22 @@ public class Master extends AppCompatActivity implements FragmentDrawer.Fragment
                     fragment = new VisitPending();
                     break;
                 case 900:
-                    CatalogoServicio catalogoServicio = new CatalogoServicio(getBaseContext());
-                    catalogoServicio.BorraUnicoUserAutenticado(BaseClass.usuarioLogged.Id);
-                    BaseClass.usuarioLogged = null;
-                    startActivity(new Intent(this, Login.class));
-                    finish();
+                    BaseClass.ShowConfirm("Confirmación", "¿Desea cerrar sesión?", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                CatalogoServicio.getInstance().DeleteUserAuthenticated(BaseClass.usuarioLogged.Id);
+                                BaseClass.usuarioLogged = null;
+                                startActivity(new Intent(Master.this, Login.class));
+                                finish();
+                            } catch (CustomException ex) {
+                                BaseClass.ToastAlert(ex.getMessage(), mContext);
+                            } catch (Exception ex) {
+                                LogErrorRepository.BuildLogError(ex, mContext);
+                                BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
+                            }
+                        }
+                    }, Master.this);
                     break;
                 default:
                     break;
@@ -149,11 +160,9 @@ public class Master extends AppCompatActivity implements FragmentDrawer.Fragment
                 fragmentTransaction.addToBackStack(null).commit();
                 getSupportActionBar().setTitle(title);
             }
-        } catch (CustomException ex) {
-            BaseClass.ToastAlert(ex.getMessage(), getBaseContext());
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getBaseContext());
-            BaseClass.ToastAlert("Error interno de sistema", getBaseContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
     }
 }

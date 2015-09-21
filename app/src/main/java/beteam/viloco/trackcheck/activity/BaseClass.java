@@ -125,4 +125,40 @@ public class BaseClass extends Activity {
         // Showing Alert Message
         alertDialog.show();
     }
+
+    public static void showSettingsNetworkAndGPSAlert(Context context) {
+        final Context mContext = context;
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
+
+        // Setting Dialog Title
+        alertDialog.setTitle("Habilitar Internet");
+
+        // Setting Dialog Message
+        alertDialog.setMessage("El Internet no esta habilitado. Por favor habilite el Internet por 3G o Wifi");
+
+        // On pressing Settings button
+        alertDialog.setPositiveButton("Wifi", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                mContext.startActivity(intent);
+            }
+        });
+
+        alertDialog.setNeutralButton("Mobile Data", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS);
+                mContext.startActivity(intent);
+            }
+        });
+
+        alertDialog.setNegativeButton("GPS", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                mContext.startActivity(intent);
+            }
+        });
+
+        // Showing Alert Message
+        alertDialog.show();
+    }
 }

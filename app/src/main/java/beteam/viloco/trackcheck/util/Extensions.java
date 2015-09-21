@@ -10,7 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
 
-import beteam.viloco.trackcheck.repositorios.LogErrorRepositorio;
+import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.repositorios.Mapper;
 
 import org.ksoap2.serialization.PropertyInfo;
@@ -45,7 +45,7 @@ public class Extensions {
         int height = bm.getHeight();
         int newWidth = width;
         int newHeight = height;
-        final int desiredSize = 700; //pixeles
+        final int desiredSize = 700; //pixels
         float scale = 1;
 
         while (newWidth > desiredSize && newHeight > desiredSize) {
@@ -142,7 +142,7 @@ public class Extensions {
                                     field.set(object, soapObject.getProperty(j).toString());
                                 break;
                             } catch (IllegalAccessException ex) {
-                                LogErrorRepositorio.ArmaLogError(ex, context);
+                                LogErrorRepository.BuildLogError(ex, context);
                             }
                         }
                     }
@@ -158,11 +158,16 @@ public class Extensions {
                                         field.set(object, FillSoapObjectType(ot, Mapper.InstanceOfObjectType(ot.getName()), context));
                                 } else if (field.getType() == List.class) {
                                     //TODO
-                                } else
-                                    field.set(object, FillSoapObjectType((SoapObject) soapObject.getProperty(j), Mapper.InstanceOfObjectType(field.getClass().getSimpleName()), context));
+                                } else {
+                                    Object tempObject = Mapper.InstanceOfObjectType(field.getClass().getSimpleName());
+                                    if (tempObject == null)
+                                        field.set(object, null);
+                                    else
+                                        field.set(object, FillSoapObjectType((SoapObject) soapObject.getProperty(j), Mapper.InstanceOfObjectType(field.getClass().getSimpleName()), context));
+                                }
                                 break;
                             } catch (IllegalAccessException ex) {
-                                LogErrorRepositorio.ArmaLogError(ex, context);
+                                LogErrorRepository.BuildLogError(ex, context);
                             }
                         }
                     }
@@ -172,7 +177,7 @@ public class Extensions {
                             try {
                                 field.set(object, soapObject.getProperty(j));
                             } catch (IllegalAccessException ex) {
-                                LogErrorRepositorio.ArmaLogError(ex, context);
+                                LogErrorRepository.BuildLogError(ex, context);
                             }
                         }
                     }
@@ -208,7 +213,7 @@ public class Extensions {
                                 field.set(object, new Date(cursor.getLong(j)));
                             break;
                         } catch (IllegalAccessException ex) {
-                            LogErrorRepositorio.ArmaLogError(ex, context);
+                            LogErrorRepository.BuildLogError(ex, context);
                         }
                     }
                 }
@@ -235,7 +240,7 @@ public class Extensions {
                         field.getType() == BigDecimal.class)
                     values.put(field.getName(), field.get(object).toString());
             } catch (Exception ex) {
-                LogErrorRepositorio.ArmaLogError(ex, context);
+                LogErrorRepository.BuildLogError(ex, context);
             }
         }
 

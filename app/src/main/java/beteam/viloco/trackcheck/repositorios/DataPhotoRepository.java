@@ -4,29 +4,29 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import beteam.viloco.trackcheck.dto.Constantes;
 import beteam.viloco.trackcheck.dto.DataPhotoDTO;
+import beteam.viloco.trackcheck.dto.Predicate;
 import beteam.viloco.trackcheck.model.DatabaseHelper;
+import beteam.viloco.trackcheck.util.CustomException;
 import beteam.viloco.trackcheck.util.Extensions;
 
-import java.util.Map;
-import java.util.Vector;
+import java.util.ArrayList;
 
-public class DataPhotoRepositorio {
+public class DataPhotoRepository {
     private Context context;
 
-    public DataPhotoRepositorio(Context context) {
+    public DataPhotoRepository(Context context) {
         this.context = context;
     }
 
-    public Vector<DataPhotoDTO> ReadAllByPredicate(Map<String, String> searchparams) {
-        Vector<DataPhotoDTO> list = new Vector<>();
+    public ArrayList<DataPhotoDTO> ReadAllByPredicate(ArrayList<Predicate> predicates) throws CustomException {
+        ArrayList<DataPhotoDTO> list = new ArrayList<>();
 
-        String query = "SELECT * FROM " + Constantes.DataPhoto + " WHERE 1=1";
+        String query = "SELECT * FROM " + DatabaseHelper.DataPhoto + " WHERE 1=1";
 
-        if (searchparams != null)
-            for (Map.Entry<String, String> param : searchparams.entrySet()) {
-                query += " AND " + param.getKey() + " = " + param.getValue();
+        if (predicates != null)
+            for (Predicate predicate : predicates) {
+                query += " " + predicate.Comparison + " " + predicate.Column + " = " + predicate.Value;
             }
 
         DatabaseHelper dbHelper = new DatabaseHelper(context);
@@ -41,7 +41,8 @@ public class DataPhotoRepositorio {
                 } while (cursor.moveToNext());
             }
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, context);
+            throw new CustomException("Hubo un error al consultar la base");
         }
 
         return list;

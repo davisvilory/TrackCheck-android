@@ -1,16 +1,20 @@
 package beteam.viloco.trackcheck.dto;
 
-import java.util.List;
 import org.ksoap2.serialization.KvmSerializable;
 import org.ksoap2.serialization.PropertyInfo;
+
+import java.util.ArrayList;
 
 import java.util.Hashtable;
 
 public class ZoneDTO implements KvmSerializable {
     public int Id;
+    public static String IdCNProp = "Id";
     public String Name = "";
+    public static String NameCNProp = "Name";
     public String Description = "";
-    public List<DataDTO> Data;
+    public static String DescriptionCNProp = "Description";
+    public ArrayList<DataDTO> Data;
 
     public ZoneDTO() {
     }
@@ -59,27 +63,6 @@ public class ZoneDTO implements KvmSerializable {
             default:
                 break;
         }
-    }
-
-    public PropertyInfo getPropertyInfo(int index) {
-        PropertyInfo info = new PropertyInfo();
-        switch (index) {
-            case 0:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "Id";
-                break;
-            case 1:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "Name";
-                break;
-            case 2:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "Description";
-                break;
-            default:
-                break;
-        }
-        return info;
     }
 
     public void setProperty(int index, Object value) {

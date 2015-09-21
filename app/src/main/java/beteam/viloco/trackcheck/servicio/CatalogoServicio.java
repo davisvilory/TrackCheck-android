@@ -4,20 +4,22 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Base64;
 
+import beteam.viloco.trackcheck.dto.BusinessTypeDTO;
 import beteam.viloco.trackcheck.dto.DataDTO;
+import beteam.viloco.trackcheck.dto.DataPhotoDTO;
 import beteam.viloco.trackcheck.dto.ModulosDTO;
 import beteam.viloco.trackcheck.dto.TerritoryDTO;
 import beteam.viloco.trackcheck.dto.UserDTO;
 import beteam.viloco.trackcheck.dto.ZoneDTO;
-import beteam.viloco.trackcheck.repositorios.DataRepositorio;
-import beteam.viloco.trackcheck.repositorios.TerritoryRepositorio;
-import beteam.viloco.trackcheck.repositorios.UserRepositorio;
-import beteam.viloco.trackcheck.repositorios.ZoneRepositorio;
+import beteam.viloco.trackcheck.repositorios.BusinessTypeRepository;
+import beteam.viloco.trackcheck.repositorios.DataRepository;
+import beteam.viloco.trackcheck.repositorios.TerritoryRepository;
+import beteam.viloco.trackcheck.repositorios.UserRepository;
+import beteam.viloco.trackcheck.repositorios.ZoneRepository;
 import beteam.viloco.trackcheck.util.CustomException;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 public class CatalogoServicio {
     private static Context mContext;
@@ -33,23 +35,23 @@ public class CatalogoServicio {
     }
 
     /*User*/
-    public UserDTO ObtieneUnicoUserAutenticado() throws CustomException {
-        UserRepositorio repo = new UserRepositorio(mContext);
-        return repo.ObtieneUnicoUserAutenticado();
+    public UserDTO GetUserAuthenticated() throws CustomException {
+        UserRepository repo = new UserRepository(mContext);
+        return repo.GetUserAuthenticated();
     }
 
-    public boolean InsertaUnicoUserAutenticado(UserDTO user) throws CustomException {
-        UserRepositorio repo = new UserRepositorio(mContext);
-        return repo.InsertaUnicoUserAutenticado(user);
+    public boolean InsertUserAuthenticated(UserDTO user) throws CustomException {
+        UserRepository repo = new UserRepository(mContext);
+        return repo.InsertUserAuthenticated(user);
     }
 
-    public boolean BorraUnicoUserAutenticado(int Id) throws CustomException {
-        UserRepositorio repo = new UserRepositorio(mContext);
-        return repo.BorraUnicoUserAutenticado(Id);
+    public boolean DeleteUserAuthenticated(int Id) throws CustomException {
+        UserRepository repo = new UserRepository(mContext);
+        return repo.DeleteUserAuthenticated(Id);
     }
 
-    public List<ModulosDTO> ObtieneModulos() throws CustomException {
-        List<ModulosDTO> list = new ArrayList<>();
+    public ArrayList<ModulosDTO> GetModules() throws CustomException {
+        ArrayList<ModulosDTO> list = new ArrayList<>();
 
         ModulosDTO modulosDTO = new ModulosDTO();
         modulosDTO.Nombre = "Inicio";
@@ -73,7 +75,7 @@ public class CatalogoServicio {
 
     /*Data*/
     public boolean InsertaData(DataDTO dataDTO) throws CustomException {
-        DataRepositorio repo = new DataRepositorio(mContext);
+        DataRepository repo = new DataRepository(mContext);
 
         for (int i = 0; i < dataDTO.DataPhoto.size(); i++) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -81,48 +83,79 @@ public class CatalogoServicio {
             dataDTO.DataPhoto.get(i).Photo = Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP);
         }
 
-        return repo.InsertaData(dataDTO);
+        return repo.InsertData(dataDTO);
     }
 
-    public List<DataDTO> ReadAllData() throws CustomException {
-        DataRepositorio repo = new DataRepositorio(mContext);
-        return repo.ReadAllByPredicate(null);
+    public ArrayList<DataDTO> GetDataPending() throws CustomException {
+        DataRepository repo = new DataRepository(mContext);
+        return repo.GetDataPending();
     }
 
-    public void SendVisitasPendientes() throws CustomException {
-        DataRepositorio repo = new DataRepositorio(mContext);
-        repo.SendVisitasPendientes();
+    public int SendDataPending(DataDTO dataDTO) throws CustomException {
+        DataRepository repo = new DataRepository(mContext);
+        return repo.SendDataPending(dataDTO);
+    }
+
+    public int SendDataPhotoPending(DataPhotoDTO dataPhotoDTO) throws CustomException {
+        DataRepository repo = new DataRepository(mContext);
+        return repo.SendDataPhotoPending(dataPhotoDTO);
+    }
+
+    public DataDTO ReadFirstData() throws CustomException {
+        DataRepository repo = new DataRepository(mContext);
+        return repo.ReadFirstByPredicate(null);
+    }
+
+    public boolean DeleteDataAndPhoto(int Id) throws CustomException{
+        DataRepository repo = new DataRepository(mContext);
+        return repo.DeleteDataAndPhoto(Id);
     }
 
     /*Territory*/
-    public boolean ExisteTerritories() throws CustomException {
-        TerritoryRepositorio territoryRepositorio = new TerritoryRepositorio(mContext);
-        return territoryRepositorio.ExisteTerritories();
+    public boolean ExistsTerritories() throws CustomException {
+        TerritoryRepository repo = new TerritoryRepository(mContext);
+        return repo.ExistsTerritories();
     }
 
-    public List<TerritoryDTO> ReadAllTerritory() throws CustomException {
-        TerritoryRepositorio repo = new TerritoryRepositorio(mContext);
+    public ArrayList<TerritoryDTO> ReadAllTerritory() throws CustomException {
+        TerritoryRepository repo = new TerritoryRepository(mContext);
         return repo.ReadAllByPredicate(null);
     }
 
-    public boolean ObtieneTerritories() throws CustomException {
-        TerritoryRepositorio repo = new TerritoryRepositorio(mContext);
-        return repo.ObtieneTerritories();
+    public boolean GetTerritories() throws CustomException {
+        TerritoryRepository repo = new TerritoryRepository(mContext);
+        return repo.GetTerritories();
     }
 
     /*Zone*/
-    public boolean ExisteZones() throws CustomException {
-        ZoneRepositorio zoneRepositorio = new ZoneRepositorio(mContext);
-        return zoneRepositorio.ExisteZones();
+    public boolean ExistsZones() throws CustomException {
+        ZoneRepository repo = new ZoneRepository(mContext);
+        return repo.ExistsZones();
     }
 
-    public List<ZoneDTO> ReadAllZone() throws CustomException {
-        ZoneRepositorio repo = new ZoneRepositorio(mContext);
+    public ArrayList<ZoneDTO> ReadAllZone() throws CustomException {
+        ZoneRepository repo = new ZoneRepository(mContext);
         return repo.ReadAllByPredicate(null);
     }
 
-    public boolean ObtieneZones() throws CustomException {
-        ZoneRepositorio repo = new ZoneRepositorio(mContext);
-        return repo.ObtieneZones();
+    public boolean GetZones() throws CustomException {
+        ZoneRepository repo = new ZoneRepository(mContext);
+        return repo.GetZones();
+    }
+
+    /*BusinessType*/
+    public boolean ExistsBusinessTypes() throws CustomException {
+        BusinessTypeRepository repo = new BusinessTypeRepository(mContext);
+        return repo.ExistsBusinessTypes();
+    }
+
+    public ArrayList<BusinessTypeDTO> ReadAllBusinessType() throws CustomException {
+        BusinessTypeRepository repo = new BusinessTypeRepository(mContext);
+        return repo.ReadAllByPredicate(null);
+    }
+
+    public boolean GetBusinessTypes() throws CustomException {
+        BusinessTypeRepository repo = new BusinessTypeRepository(mContext);
+        return repo.GetBusinessTypes();
     }
 }

@@ -3,6 +3,7 @@ package beteam.viloco.trackcheck.fragment;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -31,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 
 import beteam.viloco.trackcheck.R;
 import beteam.viloco.trackcheck.activity.BaseClass;
@@ -39,29 +39,31 @@ import beteam.viloco.trackcheck.activity.Master;
 import beteam.viloco.trackcheck.adapter.ExpandableHeightListView;
 import beteam.viloco.trackcheck.adapter.PhotosListViewAdapter;
 import beteam.viloco.trackcheck.adapter.SpinnerAdapter;
+import beteam.viloco.trackcheck.dto.BusinessTypeDTO;
 import beteam.viloco.trackcheck.dto.DataDTO;
 import beteam.viloco.trackcheck.dto.DataPhotoDTO;
 import beteam.viloco.trackcheck.dto.SpinnerCustom;
 import beteam.viloco.trackcheck.dto.TerritoryDTO;
 import beteam.viloco.trackcheck.dto.ZoneDTO;
-import beteam.viloco.trackcheck.repositorios.LogErrorRepositorio;
+import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.servicio.CatalogoServicio;
 import beteam.viloco.trackcheck.util.CustomException;
 import beteam.viloco.trackcheck.util.Extensions;
 import beteam.viloco.trackcheck.util.GPSTracker;
 
 public class FormVisit extends Fragment {
-    private View formVisit;
-    private Task task = null;
-    private View mProgressView;
-    private View mFormView;
-    private static final int CAMERA_REQUEST = 1888;
-    private static final int PICK_IMAGE = 111;
-    private static DataDTO dataDTO;
-    private GPSTracker gps;
-    private PhotosListViewAdapter photosAdapter;
-    private ExpandableHeightListView listView;
-    private Boolean isLocationServicesActive = false;
+    Context mContext;
+    View formVisit;
+    Task task = null;
+    View mProgressView;
+    View mFormView;
+    static final int CAMERA_REQUEST = 1888;
+    static final int PICK_IMAGE = 111;
+    static DataDTO dataDTO;
+    GPSTracker gps;
+    PhotosListViewAdapter photosAdapter;
+    ExpandableHeightListView listView;
+    Boolean isLocationServicesActive = false;
 
     public FormVisit() {
     }
@@ -70,7 +72,8 @@ public class FormVisit extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        new CatalogoServicio(getContext());
+        mContext = getContext();
+        new CatalogoServicio(mContext);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -99,11 +102,11 @@ public class FormVisit extends Fragment {
             mFormView = formVisit.findViewById(R.id.FormVisitForm);
             mProgressView = formVisit.findViewById(R.id.FormVisitProgress);
 
-            gps = new GPSTracker(getContext());
+            gps = new GPSTracker(mContext);
             dataDTO = new DataDTO();
-            dataDTO.DataPhoto = new Vector<>();
+            dataDTO.DataPhoto = new ArrayList<>();
             listView = (ExpandableHeightListView) formVisit.findViewById(R.id.FormVisitPhotos);
-            photosAdapter = new PhotosListViewAdapter(getContext(), dataDTO.DataPhoto);
+            photosAdapter = new PhotosListViewAdapter(mContext, dataDTO.DataPhoto);
             listView.setAdapter(photosAdapter);
             listView.setExpanded(true);
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -123,7 +126,7 @@ public class FormVisit extends Fragment {
                 list.add(new SpinnerCustom(territoryDTO.Id, territoryDTO.Name));
             }
 
-            ((Spinner) formVisit.findViewById(R.id.FormVisitTerritory)).setAdapter(new SpinnerAdapter(getContext(), list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitTerritory)).setAdapter(new SpinnerAdapter(mContext, list));
 
             list = new ArrayList<>();
             List<ZoneDTO> zoneDTOList = CatalogoServicio.getInstance().ReadAllZone();
@@ -132,38 +135,58 @@ public class FormVisit extends Fragment {
                 list.add(new SpinnerCustom(zoneDTO.Id, zoneDTO.Name));
             }
 
-            ((Spinner) formVisit.findViewById(R.id.FormVisitZone)).setAdapter(new SpinnerAdapter(getContext(), list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitZone)).setAdapter(new SpinnerAdapter(mContext, list));
+
+            list = new ArrayList<>();
+            List<BusinessTypeDTO> businessTypeDTOList = CatalogoServicio.getInstance().ReadAllBusinessType();
+            for (int i = 0; i < businessTypeDTOList.size(); i++) {
+                BusinessTypeDTO businessTypeDTO = businessTypeDTOList.get(i);
+                list.add(new SpinnerCustom(businessTypeDTO.Id, businessTypeDTO.Name));
+            }
+
+            Spinner spinner = (Spinner) formVisit.findViewById(R.id.FormVisitBusinessType);
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (position == 0) {
+                        ((EditText) formVisit.findViewById(R.id.FormVisitSerialNumber)).setText("TM");
+                    } else if (position == 1) {
+                        ((EditText) formVisit.findViewById(R.id.FormVisitSerialNumber)).setText("");
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            spinner.setAdapter(new SpinnerAdapter(mContext, list));
 
             list = new ArrayList<>();
             for (int i = 0; i < 11; i++) {
                 list.add(new SpinnerCustom(i, "" + i));
             }
-            ((Spinner) formVisit.findViewById(R.id.FormVisitPoster)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitThermoRoshpack60x40)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitThermoTi2260x40)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitElectroGota)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitElectroImagen)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitBanderola)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitCalcomanis)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitCaballeteCambioAceite)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitCaballeteVentaAceite)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitLona2x1Roshpack)).setAdapter(new SpinnerAdapter(getContext(), list));
-            ((Spinner) formVisit.findViewById(R.id.FormVisitLona2x1ImagenMecanico)).setAdapter(new SpinnerAdapter(getContext(), list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitPoster)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitThermoRoshpack60x40)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitThermoTi2260x40)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitElectroGota)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitElectroImagen)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitBanderola)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitCalcomanis)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitCaballeteCambioAceite)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitCaballeteVentaAceite)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitLona2x1Roshpack)).setAdapter(new SpinnerAdapter(mContext, list));
+            ((Spinner) formVisit.findViewById(R.id.FormVisitLona2x1ImagenMecanico)).setAdapter(new SpinnerAdapter(mContext, list));
 
             CheckSources();
         } catch (CustomException ex) {
-            BaseClass.ToastAlert(ex.getMessage(), getContext());
+            BaseClass.ToastAlert(ex.getMessage(), mContext);
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getContext());
-            BaseClass.ToastAlert("Error interno de sistema", getContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
 
         return formVisit;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -173,8 +196,7 @@ public class FormVisit extends Fragment {
         try {
             gps.stopUsingGPS();
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getContext());
-            BaseClass.ToastAlert("Error interno de sistema", getContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
         }
     }
 
@@ -187,28 +209,23 @@ public class FormVisit extends Fragment {
         menu.findItem(R.id.action_gps).setVisible(true);
         menu.findItem(R.id.action_sync).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(true);
+        menu.findItem(R.id.action_getcatalogs).setVisible(false);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                return false;
-            case R.id.action_search:
-                return false;
             case R.id.action_gps:
                 BaseClass.ShowConfirm("Confirmación", "Si vuelve a obtenr su ubicación, se sobreescribiran los datos de la dirección, ¿Esta seguro de querer continuar?", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         CheckSources();
                     }
-                }, getContext());
+                }, mContext);
                 return true;
-            case R.id.action_sync:
-                return false;
             case R.id.action_refresh:
                 RefreshForm((ViewGroup) mFormView);
-                return false;
+                return true;
         }
 
         return false;
@@ -218,52 +235,56 @@ public class FormVisit extends Fragment {
         gps.stopUsingGPS();
         gps.getLocation();
 
-        if (!Extensions.isConnectionAvailable(getContext())) {
-            BaseClass.showSettingsNetworkAlert(getContext());
+        if (!Extensions.isConnectionAvailable(mContext) && !gps.isGPSEnabled()) {
+            BaseClass.showSettingsNetworkAndGPSAlert(mContext);
             isLocationServicesActive = false;
+//        } else {
+//            if (!gps.isGPSEnabled()) {
+//                gps.showSettingsGPSAlert();
+//                isLocationServicesActive = false;
         } else {
-            if (!gps.isGPSEnabled()) {
-                gps.showSettingsGPSAlert();
-                isLocationServicesActive = false;
-            } else {
-                if (gps.canGetLocation()) {
-                    try {
-                        dataDTO.Latitude = gps.getLatitude();
-                        dataDTO.Longitude = gps.getLongitude();
-                        //((TextView) formVisit.findViewById(R.id.FormVisitLatitud)).setText(String.valueOf(dataDTO.Latitude));
-                        //((TextView) formVisit.findViewById(R.id.FormVisitLongitud)).setText(String.valueOf(dataDTO.Longitude));
+            if (gps.canGetLocation()) {
+                try {
+                    dataDTO.Latitude = gps.getLatitude();
+                    dataDTO.Longitude = gps.getLongitude();
+                    //((TextView) formVisit.findViewById(R.id.FormVisitLatitud)).setText(String.valueOf(dataDTO.Latitude));
+                    //((TextView) formVisit.findViewById(R.id.FormVisitLongitud)).setText(String.valueOf(dataDTO.Longitude));
 
-                        Geocoder gcd = new Geocoder(getContext(), new Locale("es", "MX"));
-                        List<Address> addresses;
-                        addresses = gcd.getFromLocation(dataDTO.Latitude, dataDTO.Longitude, 1);
-                        if (addresses != null && addresses.size() > 0) {
-                            dataDTO.Street = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getAddressLine(0));
-                            dataDTO.Number = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getFeatureName());
-                            dataDTO.Colony = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getAddressLine(1));
-                            dataDTO.City = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getLocality());
-                            dataDTO.DelegationTown = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getSubAdminArea());
-                            dataDTO.State = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getAdminArea());
-                            dataDTO.PostalCode = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getAddressLine(2).split(" ")[0]);
-                            ((TextView) formVisit.findViewById(R.id.FormVisitStreet)).setText(dataDTO.Street);
-                            ((TextView) formVisit.findViewById(R.id.FormVisitNumber)).setText(dataDTO.Number);
-                            ((TextView) formVisit.findViewById(R.id.FormVisitColony)).setText(dataDTO.Colony);
-                            ((TextView) formVisit.findViewById(R.id.FormVisitCity)).setText(dataDTO.City);
-                            ((TextView) formVisit.findViewById(R.id.FormVisitDelegationTown)).setText(dataDTO.DelegationTown);
-                            ((TextView) formVisit.findViewById(R.id.FormVisitState)).setText(dataDTO.State);
-                            ((TextView) formVisit.findViewById(R.id.FormVisitPostalCode)).setText(dataDTO.PostalCode);
-                        }
-                        isLocationServicesActive = true;
-                    } catch (Exception ex) {
-                        LogErrorRepositorio.ArmaLogError(ex, getContext());
-                        BaseClass.ShowAlert("Servicio no disponible",
-                                "Servicio no disponible, Es posible que los servicios de google play no esten instalados o esten siendo bloqueados por otra aplicación, para obtener la direccion aproximada asegurece de tener instalado Google Play Services y dar click de nuevo al boton superior derecho. Si aun sigue sin poder obtener la dirección aproximada capture manualmente la dirección.",
-                                getContext());
-                        isLocationServicesActive = true;
+                    Geocoder gcd = new Geocoder(mContext, new Locale("es", "MX"));
+                    List<Address> addresses;
+                    addresses = gcd.getFromLocation(dataDTO.Latitude, dataDTO.Longitude, 1);
+                    if (addresses != null && addresses.size() > 0) {
+                        dataDTO.Street = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getAddressLine(0));
+                        dataDTO.Number = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getFeatureName());
+                        dataDTO.Colony = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getAddressLine(1));
+                        dataDTO.City = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getLocality());
+                        dataDTO.DelegationTown = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getSubAdminArea());
+                        dataDTO.State = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getAdminArea());
+                        dataDTO.PostalCode = Extensions.EmptyOrNullOrWhiteSpace(addresses.get(0).getAddressLine(2).split(" ")[0]);
+                        ((TextView) formVisit.findViewById(R.id.FormVisitStreet)).setText(dataDTO.Street);
+                        ((TextView) formVisit.findViewById(R.id.FormVisitNumber)).setText(dataDTO.Number);
+                        ((TextView) formVisit.findViewById(R.id.FormVisitColony)).setText(dataDTO.Colony);
+                        ((TextView) formVisit.findViewById(R.id.FormVisitCity)).setText(dataDTO.City);
+                        ((TextView) formVisit.findViewById(R.id.FormVisitDelegationTown)).setText(dataDTO.DelegationTown);
+                        ((TextView) formVisit.findViewById(R.id.FormVisitState)).setText(dataDTO.State);
+                        ((TextView) formVisit.findViewById(R.id.FormVisitPostalCode)).setText(dataDTO.PostalCode);
                     }
-                } else
-                    isLocationServicesActive = false;
+                    isLocationServicesActive = true;
+                } catch (Exception ex) {
+                    LogErrorRepository.BuildLogError(ex, mContext);
+                    BaseClass.ShowAlert("Servicio no disponible",
+                            "Servicio no disponible, Es posible que los servicios de google play no esten instalados o esten siendo bloqueados por otra aplicación, para obtener la direccion aproximada asegurece de tener instalado Google Play Services y dar click de nuevo al boton superior derecho. Si aun sigue sin poder obtener la dirección aproximada capture manualmente la dirección.",
+                            mContext);
+                    isLocationServicesActive = true;
+                }
+            } else {
+                isLocationServicesActive = false;
+                BaseClass.ShowAlert("Ubicación no disponible",
+                        "No se ha logrado obtener su ubicación, si solo tiene habilitado el GPS es posible que tarde unos minutos en ubicar su posicion, si despues de varios intentos no se obtiene su ubicación habilite el internet para obtener su ubicación. Una vez guardada la visita, puede apagar el internet",
+                        mContext);
             }
         }
+//        }
     }
 
     private void TakePhoto() {
@@ -276,10 +297,10 @@ public class FormVisit extends Fragment {
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
             }
             //        } catch (CustomException ex) {
-//            BaseClass.ToastAlert(ex.getMessage(), getContext());
+//            BaseClass.ToastAlert(ex.getMessage(), mContext);
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getContext());
-            BaseClass.ToastAlert("Error interno de sistema", getContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
     }
 
@@ -292,10 +313,10 @@ public class FormVisit extends Fragment {
             intent.setType("image/*");
             startActivityForResult(intent, PICK_IMAGE);
             //        } catch (CustomException ex) {
-//            BaseClass.ToastAlert(ex.getMessage(), getContext());
+//            BaseClass.ToastAlert(ex.getMessage(), mContext);
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getContext());
-            BaseClass.ToastAlert("Error interno de sistema", getContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
     }
 
@@ -345,8 +366,8 @@ public class FormVisit extends Fragment {
                     break;
             }
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getContext());
-            BaseClass.ToastAlert("Error interno de sistema", getContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
     }
 
@@ -358,11 +379,12 @@ public class FormVisit extends Fragment {
             if (!isLocationServicesActive) {
                 BaseClass.ShowAlert("Ubicación no encontrada",
                         "No ha habilitado los servicios de internet y GPS. Para poder guardar es necesario obtener su ubicación aproximada. Utilice el boton de la parte superior derecha",
-                        getContext());
+                        mContext);
                 return;
             }
 
             EditText txtBusiness = (EditText) formVisit.findViewById(R.id.FormVisitBusiness);
+            EditText txtSerialNumber = (EditText) formVisit.findViewById(R.id.FormVisitSerialNumber);
             EditText txtStreet = (EditText) formVisit.findViewById(R.id.FormVisitStreet);
             EditText txtNumber = (EditText) formVisit.findViewById(R.id.FormVisitNumber);
             EditText txtColony = (EditText) formVisit.findViewById(R.id.FormVisitColony);
@@ -370,6 +392,7 @@ public class FormVisit extends Fragment {
             EditText txtCity = (EditText) formVisit.findViewById(R.id.FormVisitCity);
             EditText txtState = (EditText) formVisit.findViewById(R.id.FormVisitState);
             EditText txtPostalCode = (EditText) formVisit.findViewById(R.id.FormVisitPostalCode);
+            Spinner ddlBusinessType = (Spinner) formVisit.findViewById(R.id.FormVisitBusinessType);
             Spinner ddlTerritory = (Spinner) formVisit.findViewById(R.id.FormVisitTerritory);
             Spinner ddlZone = (Spinner) formVisit.findViewById(R.id.FormVisitZone);
             Spinner ddlPoster = (Spinner) formVisit.findViewById(R.id.FormVisitPoster);
@@ -385,6 +408,7 @@ public class FormVisit extends Fragment {
             Spinner ddlLona2x1ImagenMecanico = (Spinner) formVisit.findViewById(R.id.FormVisitLona2x1ImagenMecanico);
 
             txtBusiness.setError(null);
+            txtSerialNumber.setError(null);
             txtStreet.setError(null);
             txtNumber.setError(null);
             txtColony.setError(null);
@@ -394,9 +418,11 @@ public class FormVisit extends Fragment {
             txtPostalCode.setError(null);
 
             dataDTO.IdUser = BaseClass.usuarioLogged.Id;
-            dataDTO.IdTerritory = Integer.parseInt(String.valueOf(((SpinnerCustom) ddlTerritory.getSelectedItem()).Id));
-            dataDTO.IdZone = Integer.parseInt(String.valueOf(((SpinnerCustom) ddlZone.getSelectedItem()).Id));
+            dataDTO.IdTerritory = ddlTerritory.getSelectedItem() == null ? 0 : Integer.parseInt(String.valueOf(((SpinnerCustom) ddlTerritory.getSelectedItem()).Id));
+            dataDTO.IdZone = ddlZone.getSelectedItem() == null ? 0 : Integer.parseInt(String.valueOf(((SpinnerCustom) ddlZone.getSelectedItem()).Id));
+            dataDTO.IdBusinessType = ddlBusinessType.getSelectedItem() == null ? 0 : Integer.parseInt(String.valueOf(((SpinnerCustom) ddlBusinessType.getSelectedItem()).Id));
             dataDTO.BusinessName = txtBusiness.getText().toString();
+            dataDTO.SerialNumber = txtSerialNumber.getText().toString();
             dataDTO.Latitude = gps.getLatitude();
             dataDTO.Longitude = gps.getLongitude();
             dataDTO.Street = txtStreet.getText().toString();
@@ -425,6 +451,27 @@ public class FormVisit extends Fragment {
             if (TextUtils.isEmpty(dataDTO.BusinessName)) {
                 txtBusiness.setError(getString(R.string.Login_CampoObligatorio));
                 focusView = txtBusiness;
+                cancel = true;
+            }
+
+            if (dataDTO.IdBusinessType == 0) {
+                focusView = ddlBusinessType;
+                cancel = true;
+            }
+
+            if (TextUtils.isEmpty(dataDTO.SerialNumber)) {
+                txtSerialNumber.setError(getString(R.string.Login_CampoObligatorio));
+                focusView = txtSerialNumber;
+                cancel = true;
+            }
+
+            if (dataDTO.IdTerritory == 0) {
+                focusView = ddlTerritory;
+                cancel = true;
+            }
+
+            if (dataDTO.IdZone == 0) {
+                focusView = ddlZone;
                 cancel = true;
             }
 
@@ -471,7 +518,7 @@ public class FormVisit extends Fragment {
             }
 
             if (dataDTO.DataPhoto.isEmpty()) {
-                BaseClass.ToastAlert("Falta tomar la(s) foto(s)", getContext());
+                BaseClass.ToastAlert("Falta tomar la(s) foto(s)", mContext);
                 focusView = formVisit.findViewById(R.id.FormVisitPhotos);
                 cancel = true;
             }
@@ -486,13 +533,11 @@ public class FormVisit extends Fragment {
                         task = new Task(dataDTO);
                         task.execute((Void) null);
                     }
-                }, getContext());
+                }, mContext);
             }
-            //        } catch (CustomException ex) {
-//            BaseClass.ToastAlert(ex.getMessage(), getContext());
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getContext());
-            BaseClass.ToastAlert("Error interno de sistema", getContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
     }
 
@@ -511,7 +556,8 @@ public class FormVisit extends Fragment {
                 RefreshForm((ViewGroup) subgroup);
         }
 
-        dataDTO.DataPhoto = new Vector<>();
+        dataDTO = new DataDTO();
+        dataDTO.DataPhoto = new ArrayList<>();
         photosAdapter.setListData(dataDTO.DataPhoto);
         photosAdapter.notifyDataSetChanged();
         listView.setExpanded(true);
@@ -551,8 +597,9 @@ public class FormVisit extends Fragment {
     }
 
     public class Task extends AsyncTask<Void, Void, Boolean> {
-        private boolean enviado;
-        private DataDTO dataDTO;
+        boolean enviado;
+        DataDTO dataDTO;
+        String message;
 
         Task(DataDTO dataDTO) {
             this.dataDTO = dataDTO;
@@ -563,10 +610,10 @@ public class FormVisit extends Fragment {
             try {
                 enviado = CatalogoServicio.getInstance().InsertaData(dataDTO);
             } catch (CustomException ex) {
-                BaseClass.ToastAlert(ex.getMessage(), getContext());
+                message = ex.getMessage();
             } catch (Exception ex) {
-                LogErrorRepositorio.ArmaLogError(ex, getContext());
-                BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), getContext());
+                LogErrorRepository.BuildLogError(ex, mContext);
+                message = getString(R.string.Mensaje_ErrorInterno);
                 return false;
             }
 
@@ -578,8 +625,10 @@ public class FormVisit extends Fragment {
             task = null;
             showProgress(false);
 
-            if (enviado) BaseClass.ToastAlert("Guardado exitoso", getContext());
-            else BaseClass.ToastAlert("Hubo un error al guardar", getContext());
+            if (enviado) {
+                BaseClass.ToastAlert("Guardado exitoso", mContext);
+                RefreshForm((ViewGroup) mFormView);
+            } else BaseClass.ToastAlert(message, mContext);
         }
 
         @Override

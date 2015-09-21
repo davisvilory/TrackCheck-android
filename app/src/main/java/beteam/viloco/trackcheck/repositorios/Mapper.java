@@ -1,6 +1,7 @@
 package beteam.viloco.trackcheck.repositorios;
 
 import beteam.viloco.trackcheck.dto.AjaxResponse;
+import beteam.viloco.trackcheck.dto.BusinessTypeDTO;
 import beteam.viloco.trackcheck.dto.DataDTO;
 import beteam.viloco.trackcheck.dto.DataPhotoDTO;
 import beteam.viloco.trackcheck.dto.LogErrorDTO;
@@ -15,6 +16,8 @@ public class Mapper {
 
         if (tClass.equalsIgnoreCase(AjaxResponse.class.getSimpleName())) {
             object = new AjaxResponse();
+        } else if (tClass.equalsIgnoreCase(BusinessTypeDTO.class.getSimpleName())) {
+            object = new BusinessTypeDTO();
         } else if (tClass.equalsIgnoreCase(DataDTO.class.getSimpleName())) {
             object = new DataDTO();
         } else if (tClass.equalsIgnoreCase(DataPhotoDTO.class.getSimpleName())) {

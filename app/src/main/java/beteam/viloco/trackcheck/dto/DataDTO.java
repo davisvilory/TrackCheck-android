@@ -1,47 +1,84 @@
 package beteam.viloco.trackcheck.dto;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.ksoap2.serialization.KvmSerializable;
 import org.ksoap2.serialization.PropertyInfo;
 
-import java.util.Hashtable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
-import java.util.Vector;
+import java.util.ArrayList;
+
+import java.util.Hashtable;
 
 public class DataDTO implements KvmSerializable {
     public int Id;
+    public static String IdCNProp = "Id";
     public int IdUser;
+    public static String IdUserCNProp = "IdUser";
     public int IdTerritory;
+    public static String IdTerritoryCNProp = "IdTerritory";
     public int IdZone;
+    public static String IdZoneCNProp = "IdZone";
+    public int IdBusinessType;
+    public static String IdBusinessTypeCNProp = "IdBusinessType";
+    public String SerialNumber = "";
+    public static String SerialNumberCNProp = "SerialNumber";
     public String BusinessName = "";
+    public static String BusinessNameCNProp = "BusinessName";
     public double Latitude;
+    public static String LatitudeCNProp = "Latitude";
     public double Longitude;
+    public static String LongitudeCNProp = "Longitude";
     public String Street = "";
+    public static String StreetCNProp = "Street";
     public String Number = "";
+    public static String NumberCNProp = "Number";
     public String Colony = "";
+    public static String ColonyCNProp = "Colony";
     public String DelegationTown = "";
+    public static String DelegationTownCNProp = "DelegationTown";
     public String City = "";
+    public static String CityCNProp = "City";
     public String State = "";
+    public static String StateCNProp = "State";
     public String PostalCode = "";
+    public static String PostalCodeCNProp = "PostalCode";
     public int Poster;
+    public static String PosterCNProp = "Poster";
     public int ThermoRoshpack60x40;
+    public static String ThermoRoshpack60x40CNProp = "ThermoRoshpack60x40";
     public int ThermoTi2260x40;
+    public static String ThermoTi2260x40CNProp = "ThermoTi2260x40";
     public int ElectroGota;
+    public static String ElectroGotaCNProp = "ElectroGota";
     public int ElectroImagen;
+    public static String ElectroImagenCNProp = "ElectroImagen";
     public int Banderola;
+    public static String BanderolaCNProp = "Banderola";
     public int Calcomanis;
+    public static String CalcomanisCNProp = "Calcomanis";
     public int CaballeteCambioAceite;
+    public static String CaballeteCambioAceiteCNProp = "CaballeteCambioAceite";
     public int CaballeteVentaAceite;
+    public static String CaballeteVentaAceiteCNProp = "CaballeteVentaAceite";
     public int Lona2x1Roshpack;
+    public static String Lona2x1RoshpackCNProp = "Lona2x1Roshpack";
     public int Lona2x1ImagenMecanico;
+    public static String Lona2x1ImagenMecanicoCNProp = "Lona2x1ImagenMecanico";
     public Date Date;
+    public static String DateCNProp = "Date";
+    public BusinessTypeDTO BusinessType;
     public TerritoryDTO Territory;
     public UserDTO User;
     public ZoneDTO Zone;
-    public Vector<DataPhotoDTO> DataPhoto;
+    public ArrayList<DataPhotoDTO> DataPhoto;
+
+    /*Custom*/
+    public int IdServer;
+    public static String IdServerCNProp = "IdServer";
+    public int DataPhotoCount;
+    public static String DataPhotoCountCNProp = "DataPhotoCount";
 
     public DataDTO() {
     }
@@ -54,65 +91,8 @@ public class DataDTO implements KvmSerializable {
         return "";
     }
 
-    public DataDTO(
-            int id,
-            int iduser,
-            int idterritory,
-            int idzone,
-            String businessname,
-            double latitude,
-            double longitude,
-            String street,
-            String number,
-            String colony,
-            String delegationtown,
-            String city,
-            String state,
-            String postalcode,
-            int poster,
-            int thermoroshpack60x40,
-            int thermoti2260x40,
-            int electrogota,
-            int electroimagen,
-            int banderola,
-            int calcomanis,
-            int caballetecambioaceite,
-            int caballeteventaaceite,
-            int lona2x1roshpack,
-            int lona2x1imagenmecanico,
-            Date date,
-            Vector<DataPhotoDTO> dataPhoto) {
-        Id = id;
-        IdUser = iduser;
-        IdTerritory = idterritory;
-        IdZone = idzone;
-        BusinessName = businessname;
-        Latitude = latitude;
-        Longitude = longitude;
-        Street = street;
-        Number = number;
-        Colony = colony;
-        DelegationTown = delegationtown;
-        City = city;
-        State = state;
-        PostalCode = postalcode;
-        Poster = poster;
-        ThermoRoshpack60x40 = thermoroshpack60x40;
-        ThermoTi2260x40 = thermoti2260x40;
-        ElectroGota = electrogota;
-        ElectroImagen = electroimagen;
-        Banderola = banderola;
-        Calcomanis = calcomanis;
-        CaballeteCambioAceite = caballetecambioaceite;
-        CaballeteVentaAceite = caballeteventaaceite;
-        Lona2x1Roshpack = lona2x1roshpack;
-        Lona2x1ImagenMecanico = lona2x1imagenmecanico;
-        Date = date;
-        DataPhoto = dataPhoto;
-    }
-
     public int getPropertyCount() {
-        return 27;
+        return 28;
     }
 
     public Object getProperty(int arg0) {
@@ -126,54 +106,58 @@ public class DataDTO implements KvmSerializable {
             case 3:
                 return IdZone;
             case 4:
-                return BusinessName;
+                return IdBusinessType;
             case 5:
-                return Latitude;
+                return SerialNumber;
             case 6:
-                return Longitude;
+                return BusinessName;
             case 7:
-                return Street;
+                return Latitude;
             case 8:
-                return Number;
+                return Longitude;
             case 9:
-                return Colony;
+                return Street;
             case 10:
-                return DelegationTown;
+                return Number;
             case 11:
-                return City;
+                return Colony;
             case 12:
-                return State;
+                return DelegationTown;
             case 13:
-                return PostalCode;
+                return City;
             case 14:
-                return Poster;
+                return State;
             case 15:
-                return ThermoRoshpack60x40;
+                return PostalCode;
             case 16:
-                return ThermoTi2260x40;
+                return Poster;
             case 17:
-                return ElectroGota;
+                return ThermoRoshpack60x40;
             case 18:
-                return ElectroImagen;
+                return ThermoTi2260x40;
             case 19:
-                return Banderola;
+                return ElectroGota;
             case 20:
-                return Calcomanis;
+                return ElectroImagen;
             case 21:
-                return CaballeteCambioAceite;
+                return Banderola;
             case 22:
-                return CaballeteVentaAceite;
+                return Calcomanis;
             case 23:
-                return Lona2x1Roshpack;
+                return CaballeteCambioAceite;
             case 24:
-                return Lona2x1ImagenMecanico;
+                return CaballeteVentaAceite;
             case 25:
-                return Date;
+                return Lona2x1Roshpack;
             case 26:
-                return DataPhoto;
+                return Lona2x1ImagenMecanico;
+            case 27:
+                return Date;
             default:
-                return null;
+                break;
         }
+
+        return null;
     }
 
     public void getPropertyInfo(int index, Hashtable arg1, PropertyInfo info) {
@@ -195,217 +179,104 @@ public class DataDTO implements KvmSerializable {
                 info.name = "IdZone";
                 break;
             case 4:
+                info.type = PropertyInfo.INTEGER_CLASS;
+                info.name = "IdBusinessType";
+                break;
+            case 5:
+                info.type = PropertyInfo.STRING_CLASS;
+                info.name = "SerialNumber";
+                break;
+            case 6:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "BusinessName";
                 break;
-            case 5:
+            case 7:
                 info.type = double.class;
                 info.name = "Latitude";
                 break;
-            case 6:
+            case 8:
                 info.type = double.class;
                 info.name = "Longitude";
                 break;
-            case 7:
+            case 9:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "Street";
                 break;
-            case 8:
+            case 10:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "Number";
                 break;
-            case 9:
+            case 11:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "Colony";
                 break;
-            case 10:
+            case 12:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "DelegationTown";
                 break;
-            case 11:
+            case 13:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "City";
                 break;
-            case 12:
+            case 14:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "State";
                 break;
-            case 13:
+            case 15:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "PostalCode";
                 break;
-            case 14:
+            case 16:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "Poster";
                 break;
-            case 15:
+            case 17:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "ThermoRoshpack60x40";
                 break;
-            case 16:
+            case 18:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "ThermoTi2260x40";
                 break;
-            case 17:
+            case 19:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "ElectroGota";
                 break;
-            case 18:
+            case 20:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "ElectroImagen";
                 break;
-            case 19:
+            case 21:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "Banderola";
                 break;
-            case 20:
+            case 22:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "Calcomanis";
                 break;
-            case 21:
+            case 23:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "CaballeteCambioAceite";
                 break;
-            case 22:
+            case 24:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "CaballeteVentaAceite";
                 break;
-            case 23:
+            case 25:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "Lona2x1Roshpack";
                 break;
-            case 24:
+            case 26:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "Lona2x1ImagenMecanico";
                 break;
-            case 25:
-                info.type = Date.getClass();
+            case 27:
+                info.type = Date.class;
                 info.name = "Date";
-                break;
-            case 26:
-                info.type = PropertyInfo.VECTOR_CLASS;
-                info.name = "DataPhoto";
                 break;
             default:
                 break;
         }
-    }
-
-    public PropertyInfo getPropertyInfo(int index) {
-        PropertyInfo info = new PropertyInfo();
-        switch (index) {
-            case 0:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "Id";
-                break;
-            case 1:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "IdUser";
-                break;
-            case 2:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "IdTerritory";
-                break;
-            case 3:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "IdZone";
-                break;
-            case 4:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "BusinessName";
-                break;
-            case 5:
-                info.type = double.class;
-                info.name = "Latitude";
-                break;
-            case 6:
-                info.type = double.class;
-                info.name = "Longitude";
-                break;
-            case 7:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "Street";
-                break;
-            case 8:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "Number";
-                break;
-            case 9:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "Colony";
-                break;
-            case 10:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "DelegationTown";
-                break;
-            case 11:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "City";
-                break;
-            case 12:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "State";
-                break;
-            case 13:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "PostalCode";
-                break;
-            case 14:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "Poster";
-                break;
-            case 15:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "ThermoRoshpack60x40";
-                break;
-            case 16:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "ThermoTi2260x40";
-                break;
-            case 17:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "ElectroGota";
-                break;
-            case 18:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "ElectroImagen";
-                break;
-            case 19:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "Banderola";
-                break;
-            case 20:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "Calcomanis";
-                break;
-            case 21:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "CaballeteCambioAceite";
-                break;
-            case 22:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "CaballeteVentaAceite";
-                break;
-            case 23:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "Lona2x1Roshpack";
-                break;
-            case 24:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "Lona2x1ImagenMecanico";
-                break;
-            case 25:
-                info.type = Date.getClass();
-                info.name = "Date";
-                break;
-            case 26:
-                info.type = PropertyInfo.VECTOR_CLASS;
-                info.name = "DataPhoto";
-                break;
-            default:
-                break;
-        }
-        return info;
     }
 
     public void setProperty(int index, Object value) {
@@ -423,78 +294,81 @@ public class DataDTO implements KvmSerializable {
                 IdZone = Integer.parseInt(value.toString());
                 break;
             case 4:
-                BusinessName = value.toString();
+                IdBusinessType = Integer.parseInt(value.toString());
                 break;
             case 5:
-                Latitude = Double.parseDouble(value.toString());
+                SerialNumber = value.toString();
                 break;
             case 6:
-                Longitude = Double.parseDouble(value.toString());
+                BusinessName = value.toString();
                 break;
             case 7:
-                Street = value.toString();
+                Latitude = Double.parseDouble(value.toString());
                 break;
             case 8:
-                Number = value.toString();
+                Longitude = Double.parseDouble(value.toString());
                 break;
             case 9:
-                Colony = value.toString();
+                Street = value.toString();
                 break;
             case 10:
-                DelegationTown = value.toString();
+                Number = value.toString();
                 break;
             case 11:
-                City = value.toString();
+                Colony = value.toString();
                 break;
             case 12:
-                State = value.toString();
+                DelegationTown = value.toString();
                 break;
             case 13:
-                PostalCode = value.toString();
+                City = value.toString();
                 break;
             case 14:
-                Poster = Integer.parseInt(value.toString());
+                State = value.toString();
                 break;
             case 15:
-                ThermoRoshpack60x40 = Integer.parseInt(value.toString());
+                PostalCode = value.toString();
                 break;
             case 16:
-                ThermoTi2260x40 = Integer.parseInt(value.toString());
+                Poster = Integer.parseInt(value.toString());
                 break;
             case 17:
-                ElectroGota = Integer.parseInt(value.toString());
+                ThermoRoshpack60x40 = Integer.parseInt(value.toString());
                 break;
             case 18:
-                ElectroImagen = Integer.parseInt(value.toString());
+                ThermoTi2260x40 = Integer.parseInt(value.toString());
                 break;
             case 19:
-                Banderola = Integer.parseInt(value.toString());
+                ElectroGota = Integer.parseInt(value.toString());
                 break;
             case 20:
-                Calcomanis = Integer.parseInt(value.toString());
+                ElectroImagen = Integer.parseInt(value.toString());
                 break;
             case 21:
-                CaballeteCambioAceite = Integer.parseInt(value.toString());
+                Banderola = Integer.parseInt(value.toString());
                 break;
             case 22:
-                CaballeteVentaAceite = Integer.parseInt(value.toString());
+                Calcomanis = Integer.parseInt(value.toString());
                 break;
             case 23:
-                Lona2x1Roshpack = Integer.parseInt(value.toString());
+                CaballeteCambioAceite = Integer.parseInt(value.toString());
                 break;
             case 24:
-                Lona2x1ImagenMecanico = Integer.parseInt(value.toString());
+                CaballeteVentaAceite = Integer.parseInt(value.toString());
                 break;
             case 25:
+                Lona2x1Roshpack = Integer.parseInt(value.toString());
+                break;
+            case 26:
+                Lona2x1ImagenMecanico = Integer.parseInt(value.toString());
+                break;
+            case 27:
                 SimpleDateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm", new Locale("es", "MX"));
                 try {
                     Date = df.parse(value.toString().replace("T", " "));
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                } catch (ParseException ex) {
+                    //Error al convertir la fecha
                 }
-                break;
-            case 26:
-                DataPhoto = (Vector<DataPhotoDTO>) value;
                 break;
             default:
                 break;

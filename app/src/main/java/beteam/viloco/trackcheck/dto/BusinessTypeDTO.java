@@ -7,16 +7,16 @@ import java.util.ArrayList;
 
 import java.util.Hashtable;
 
-public class UserTypeDTO implements KvmSerializable {
+public class BusinessTypeDTO implements KvmSerializable {
     public int Id;
     public static String IdCNProp = "Id";
     public String Name = "";
     public static String NameCNProp = "Name";
     public String Description = "";
     public static String DescriptionCNProp = "Description";
-    public ArrayList<UserDTO> User;
+    public ArrayList<DataDTO> Data;
 
-    public UserTypeDTO() {
+    public BusinessTypeDTO() {
     }
 
     public void setInnerText(String var1) {

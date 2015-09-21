@@ -24,20 +24,26 @@ import beteam.viloco.trackcheck.activity.BaseClass;
 import beteam.viloco.trackcheck.adapter.ExpandableHeightListView;
 import beteam.viloco.trackcheck.adapter.VisitasAdapter;
 import beteam.viloco.trackcheck.dto.DataDTO;
-import beteam.viloco.trackcheck.repositorios.LogErrorRepositorio;
+import beteam.viloco.trackcheck.dto.DataPhotoDTO;
+import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.servicio.CatalogoServicio;
 import beteam.viloco.trackcheck.util.CustomException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VisitPending extends Fragment {
-    private Task task = null;
-    private View mProgressView;
-    private View mFormView;
-    private ExpandableHeightListView listView;
-    private List<DataDTO> listVisitas;
-    private RelativeLayout ningun_resultado;
-    private TextView txtNumeroSincronizar;
+    Context mContext;
+    Task task = null;
+    View mProgressView;
+    View mFormView;
+    ExpandableHeightListView listView;
+    List<DataDTO> listVisitas;
+    RelativeLayout ningun_resultado;
+    TextView txtNumeroSincronizar;
+    DataDTO mDataDTO;
+    ArrayList<DataPhotoDTO> mDataPhotoDTO;
+    int mIntents = 0;
 
     public VisitPending() {
     }
@@ -47,6 +53,7 @@ public class VisitPending extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         new CatalogoServicio(getContext());
+        mContext = getContext();
     }
 
     @Override
@@ -66,11 +73,9 @@ public class VisitPending extends Fragment {
                 task = new Task(1);
                 task.execute((Void) null);
             }
-            //} catch (CustomException ex) {
-            //    BaseClass.ToastAlert(ex.getMessage(), getBaseContext());
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getContext());
-            BaseClass.ToastAlert("Error interno de sistema", getContext());
+            LogErrorRepository.BuildLogError(ex, getContext());
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), getContext());
         }
 
         return view;
@@ -85,29 +90,25 @@ public class VisitPending extends Fragment {
         menu.findItem(R.id.action_gps).setVisible(false);
         menu.findItem(R.id.action_sync).setVisible(true);
         menu.findItem(R.id.action_refresh).setVisible(false);
-        menu.findItem(R.id.action_exitapp).setVisible(false);
         menu.findItem(R.id.action_getcatalogs).setVisible(false);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                return false;
-            case R.id.action_search:
-                return false;
-            case R.id.action_gps:
-                return false;
-            case R.id.action_sync:
-                BaseClass.ShowConfirm("Confirmación", "Se enviarán las visitas pendientes, ¿Esta seguro de continuar?", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SendVisitasPendientes();
-                    }
-                }, getContext());
-                return true;
-            case R.id.action_refresh:
-                return false;
+        try {
+            switch (item.getItemId()) {
+                case R.id.action_sync:
+                    BaseClass.ShowConfirm("Confirmación", "Se enviarán las visitas pendientes, ¿Esta seguro de continuar?", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SendVisitasPendientes();
+                        }
+                    }, getContext());
+                    return true;
+            }
+        } catch (Exception ex) {
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
         }
 
         return false;
@@ -160,20 +161,21 @@ public class VisitPending extends Fragment {
             }
 
             BaseClass.ToastAlert("Enviando las visitas pendientes, por favor espere...", getContext());
-
+            mIntents = 1;
             if (task == null) {
                 showProgress(true);
                 task = new Task(2);
                 task.execute((Void) null);
             }
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, getContext());
-            BaseClass.ToastAlert("Error interno de sistema", getContext());
+            LogErrorRepository.BuildLogError(ex, getContext());
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), getContext());
         }
     }
 
     public class Task extends AsyncTask<Void, Void, Boolean> {
         int accion = 0;
+        String message;
 
         Task(int accion) {
             this.accion = accion;
@@ -183,15 +185,50 @@ public class VisitPending extends Fragment {
         protected Boolean doInBackground(Void... params) {
             try {
                 if (accion == 1)
-                    listVisitas = CatalogoServicio.getInstance().ReadAllData();
+                    listVisitas = CatalogoServicio.getInstance().GetDataPending();
                 else if (accion == 2) {
-                    CatalogoServicio.getInstance().SendVisitasPendientes();
+                    mDataDTO = CatalogoServicio.getInstance().ReadFirstData();
+                    if (mDataDTO != null) {
+                        mDataPhotoDTO = mDataDTO.DataPhoto;
+
+                        if (mDataDTO.IdServer == 0) {
+                            mDataDTO.IdServer = CatalogoServicio.getInstance().SendDataPending(mDataDTO);
+                            if (mDataDTO.IdServer <= 0) {
+                                if (mIntents > 3)
+                                    message = "No se pudo enviar la visita, se superó el máximo de intentos";
+                                else
+                                    message = "No se pudo enviar la visita, intento número " + mIntents;
+                                return false;
+                            }
+                        }
+                    } else {
+                        message = "Ya no hay visitas que enviar, proceso de sincronización terminado";
+                        return true;
+                    }
+                } else if (accion == 3) {
+                    if (mDataPhotoDTO.size() > 0) {
+                        DataPhotoDTO dataPhotoDTO = mDataPhotoDTO.get(0);
+                        if (dataPhotoDTO.IdServer == 0) {
+                            mIntents++;
+                            dataPhotoDTO.IdData = mDataDTO.IdServer;
+                            dataPhotoDTO.IdServer = CatalogoServicio.getInstance().SendDataPhotoPending(dataPhotoDTO);
+                            if (dataPhotoDTO.IdServer <= 0) {
+                                if (mIntents > 3)
+                                    message = "No se pudo enviar la foto, se superó el máximo de intentos";
+                                else
+                                    message = "No se pudo enviar la foto, intento número " + mIntents;
+                                return false;
+                            }
+                        }
+                        mIntents = 0;
+                        mDataPhotoDTO.remove(0);
+                    }
                 }
             } catch (CustomException ex) {
-                BaseClass.ToastAlert(ex.getMessage(), getContext());
+                message = ex.getMessage();
+                return false;
             } catch (Exception ex) {
-                LogErrorRepositorio.ArmaLogError(ex, getContext());
-                BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), getContext());
+                LogErrorRepository.BuildLogError(ex, getContext());
                 return false;
             }
 
@@ -215,15 +252,93 @@ public class VisitPending extends Fragment {
                     listView.setAdapter(new VisitasAdapter(getContext(), listVisitas));
                     listView.setExpanded(true);
                 } else if (accion == 2) {
-                    if (task == null) {
-                        showProgress(true);
-                        task = new Task(1);
-                        task.execute((Void) null);
+                    if (success) {
+                        if (message == null || message.equals("")) {
+                            BaseClass.ToastAlert("Se envio la visita del negocio " + mDataDTO.BusinessName + ", Enviando las fotos...", getContext());
+                            mIntents = 0;
+                            if (task == null) {
+                                showProgress(true);
+                                task = new Task(3);
+                                task.execute((Void) null);
+                            }
+                        } else {
+                            BaseClass.ToastAlert(message, getContext());
+
+                            if (task == null) {
+                                showProgress(true);
+                                task = new Task(1);
+                                task.execute((Void) null);
+                            }
+                        }
+                    } else {
+                        if (message == null || message.equals(""))
+                            getString(R.string.Mensaje_ErrorInterno);
+                        BaseClass.ToastAlert(message, getContext());
+                        mIntents++;
+                        if (mIntents <= 3) {
+                            if (task == null) {
+                                showProgress(true);
+                                task = new Task(2);
+                                task.execute((Void) null);
+                            }
+                        } else {
+                            if (task == null) {
+                                showProgress(true);
+                                task = new Task(1);
+                                task.execute((Void) null);
+                            }
+                        }
+                    }
+                } else if (accion == 3) {
+                    if (success) {
+                        BaseClass.ToastAlert("Se envio la foto de la visita " + mDataDTO.BusinessName + ", Revisando si hay más fotos...", getContext());
+
+                        if (mDataPhotoDTO.size() > 0) {
+                            if (task == null) {
+                                showProgress(true);
+                                task = new Task(3);
+                                task.execute((Void) null);
+                            }
+                        } else {
+                            BaseClass.ToastAlert("Se enviaron todas las fotos de la visita " + mDataDTO.BusinessName + ", Revisando si hay más visitas...", getContext());
+
+                            //Se borra primero de la base
+                            if (CatalogoServicio.getInstance().DeleteDataAndPhoto(mDataDTO.Id)) {
+                                BaseClass.ToastAlert("Se borro con éxito la visita", getContext());
+                                mDataDTO = null;
+                            }
+
+                            if (task == null) {
+                                showProgress(true);
+                                task = new Task(2);
+                                task.execute((Void) null);
+                            }
+                        }
+                    } else {
+                        if (message == null || message.equals(""))
+                            getString(R.string.Mensaje_ErrorInterno);
+                        BaseClass.ToastAlert(message, getContext());
+
+                        if (mIntents <= 3) {
+                            if (mDataPhotoDTO.size() > 0) {
+                                if (task == null) {
+                                    showProgress(true);
+                                    task = new Task(3);
+                                    task.execute((Void) null);
+                                }
+                            }
+                        } else {
+                            if (task == null) {
+                                showProgress(true);
+                                task = new Task(1);
+                                task.execute((Void) null);
+                            }
+                        }
                     }
                 }
             } catch (Exception ex) {
-                LogErrorRepositorio.ArmaLogError(ex, getContext());
-                BaseClass.ToastAlert("Error interno de sistema", getContext());
+                LogErrorRepository.BuildLogError(ex, getContext());
+                BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), getContext());
             }
         }
 
@@ -231,6 +346,7 @@ public class VisitPending extends Fragment {
         protected void onCancelled() {
             task = null;
             showProgress(false);
+            BaseClass.ToastAlert("Se canceló el proceso", getContext());
         }
     }
 }

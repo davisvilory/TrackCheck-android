@@ -13,7 +13,7 @@
     <string name="drawer_close">Close</string>
 
     <!--Modulos-->
-    <string name="Nombre_Aplicacion">TrackCheck</string>
+    <string name="Nombre_Aplicacion">TargetPro</string>
     <string name="Modulo_Login">Login</string>
     <string name="Modulo_Master">Inicio</string>
     <string name="Modulo_Splash">Splash</string>
@@ -30,6 +30,8 @@
 
     <string name="FormVisitTitulo">Nueva Visita</string>
     <string name="FormVisitBusiness">Negocio</string>
+    <string name="FormVisitBusinessType">Tipo de Negocio</string>
+    <string name="FormVisitSerialNumber">Folio</string>
     <string name="FormVisitTerritory">Territorio</string>
     <string name="FormVisitZone">Zona</string>
     <string name="FormVisitLatitud">Latitud</string>
@@ -58,6 +60,7 @@
     <string name="FormVisitFotosCapturadas">Capturar evidencia</string>
     <string name="FormVisitPreview">Imagen tomada</string>
     <string name="FormVisitEnviar">Guardar visita</string>
+    <string name="FormVisitFotosTotal">Número de fotos</string>
 
     <string name="VisitPendingNingunResultado">No hay visitas pendientes</string>
     <string name="VisitPendingPorSincronizar">Visitas por sincronizar:</string>

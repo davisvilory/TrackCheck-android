@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import beteam.viloco.trackcheck.dto.AjaxResponse;
 import beteam.viloco.trackcheck.dto.Constantes;
+import beteam.viloco.trackcheck.dto.Predicate;
 import beteam.viloco.trackcheck.dto.UserDTO;
 import beteam.viloco.trackcheck.model.DatabaseHelper;
 import beteam.viloco.trackcheck.util.CustomException;
@@ -18,16 +19,16 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-import java.util.Map;
+import java.util.ArrayList;
 
-public class UserRepositorio {
+public class UserRepository {
     private Context context;
 
-    public UserRepositorio(Context context) {
+    public UserRepository(Context context) {
         this.context = context;
     }
 
-    public UserDTO AutenticaUsuario(UserDTO user) throws CustomException{
+    public UserDTO AuthenticateUser(UserDTO user) throws CustomException {
         SoapObject request = new SoapObject(Constantes.WS_TARGET_NAMESPACE, Constantes.WSMETHOD_AutenticaUser);
         PropertyInfo info = new PropertyInfo();
         info.setType(user.getClass());
@@ -38,9 +39,9 @@ public class UserRepositorio {
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
         envelope.dotNet = true;
         envelope.setOutputSoapObject(request);
-        envelope.addMapping(Constantes.WS_TARGET_NAMESPACE, "UserDTO", UserDTO.class);
+        envelope.addMapping(Constantes.WS_TARGET_NAMESPACE, UserDTO.class.getSimpleName(), UserDTO.class);
 
-        HttpTransportSE httpTransport = new HttpTransportSE(Constantes.SOAP_ADDRESS_NEGOCIO);
+        HttpTransportSE httpTransport = new HttpTransportSE(Constantes.SOAP_ADDRESS_MOBILE, 40000);
 
         try {
             httpTransport.call(Constantes.WS_TARGET_NAMESPACE + Constantes.WSMETHOD_AutenticaUser, envelope);
@@ -49,25 +50,29 @@ public class UserRepositorio {
 
             AjaxResponse ajaxResponse = Extensions.ConvertSoap(response, AjaxResponse.class, context);
 
+            user = null;
             if (ajaxResponse.Success)
-                user = (UserDTO)ajaxResponse.ReturnedObject;
+                if (ajaxResponse.ReturnedObject instanceof UserDTO)
+                    user = (UserDTO) ajaxResponse.ReturnedObject;
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, context);
+            throw new CustomException("No se pudo autenticar al usuario");
         }
 
         return user;
     }
 
-    public UserDTO ReadFirstByPredicate(Map<String, String> searchparams) throws CustomException{
+    public UserDTO ReadFirstByPredicate(ArrayList<Predicate> predicates) throws CustomException {
         UserDTO userDTO = new UserDTO();
 
         String query = "SELECT *"
-                + " FROM " + Constantes.User + " AS Us"
+                + " FROM " + DatabaseHelper.User + " AS Us"
                 + " WHERE 1=1";
 
-        for (Map.Entry<String, String> param : searchparams.entrySet()) {
-            query += " AND " + param.getKey() + " = " + param.getValue();
-        }
+        if (predicates != null)
+            for (Predicate predicate : predicates) {
+                query += " " + predicate.Comparison + " " + predicate.Column + " = " + predicate.Value;
+            }
 
         DatabaseHelper dbHelper = new DatabaseHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -81,17 +86,18 @@ public class UserRepositorio {
                 } while (cursor.moveToNext());
             }
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, context);
+            throw new CustomException("Hubo un error al consultar la base");
         }
 
         return userDTO;
     }
 
-    public UserDTO ObtieneUnicoUserAutenticado() throws CustomException{
+    public UserDTO GetUserAuthenticated() throws CustomException {
         UserDTO userDTO = null;
 
         String query = "SELECT *"
-                + " FROM " + Constantes.Autenticado + " AS Us"
+                + " FROM " + DatabaseHelper.Autenticado + " AS Us"
                 + " WHERE 1=1 LIMIT 1";
 
         DatabaseHelper dbHelper = new DatabaseHelper(context);
@@ -108,46 +114,49 @@ public class UserRepositorio {
 
             db.close();
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, context);
+            throw new CustomException("Hubo un error al consultar la base");
         }
 
         return userDTO;
     }
 
-    public boolean InsertaUnicoUserAutenticado(UserDTO user) throws CustomException{
+    public boolean InsertUserAuthenticated(UserDTO user) throws CustomException {
         DatabaseHelper dbHelper = new DatabaseHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         try {
             ContentValues values = new ContentValues();
-            values.put(user.getPropertyInfo(0).name, user.Id);
-            values.put(user.getPropertyInfo(1).name, user.IdUserType);
-            values.put(user.getPropertyInfo(2).name, user.UserName);
-            values.put(user.getPropertyInfo(3).name, user.FirstName);
-            values.put(user.getPropertyInfo(4).name, user.LastName);
-            values.put(user.getPropertyInfo(5).name, user.MiddleName);
-            values.put(user.getPropertyInfo(6).name, user.Password);
-            db.insert(Constantes.Autenticado, null, values);
+            values.put(UserDTO.IdCNProp, user.Id);
+            values.put(UserDTO.IdUserTypeCNProp, user.IdUserType);
+            values.put(UserDTO.UserNameCNProp, user.UserName);
+            values.put(UserDTO.FirstNameCNProp, user.FirstName);
+            values.put(UserDTO.LastNameCNProp, user.LastName);
+            values.put(UserDTO.MiddleNameCNProp, user.MiddleName);
+            values.put(UserDTO.PasswordCNProp, user.Password);
+            db.insert(DatabaseHelper.Autenticado, null, values);
 
             db.close();
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, context);
+            throw new CustomException("Hubo un error al consultar la base");
         }
 
         return true;
     }
 
-    public boolean BorraUnicoUserAutenticado(int Id) throws CustomException{
+    public boolean DeleteUserAuthenticated(int Id) throws CustomException {
         DatabaseHelper dbHelper = new DatabaseHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        boolean result = false;
+        boolean result;
 
         try {
-            result = db.delete(Constantes.Autenticado, "Id = " + Id, null) > 0;
+            result = db.delete(DatabaseHelper.Autenticado, UserDTO.IdCNProp + " = " + Id, null) > 0;
 
             db.close();
         } catch (Exception ex) {
-            LogErrorRepositorio.ArmaLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, context);
+            throw new CustomException("Hubo un error al consultar la base");
         }
 
         return result;

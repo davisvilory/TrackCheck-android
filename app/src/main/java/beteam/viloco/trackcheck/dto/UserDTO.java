@@ -1,6 +1,6 @@
 package beteam.viloco.trackcheck.dto;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import org.ksoap2.serialization.KvmSerializable;
 import org.ksoap2.serialization.PropertyInfo;
@@ -9,16 +9,23 @@ import java.util.Hashtable;
 
 public class UserDTO implements KvmSerializable {
     public int Id;
+    public static String IdCNProp = "Id";
     public int IdUserType;
+    public static String IdUserTypeCNProp = "IdUserType";
     public String UserName = "";
+    public static String UserNameCNProp = "UserName";
     public String FirstName = "";
+    public static String FirstNameCNProp = "FirstName";
     public String LastName = "";
+    public static String LastNameCNProp = "LastName";
     public String MiddleName = "";
+    public static String MiddleNameCNProp = "MiddleName";
     public String Password = "";
-    public List<DataDTO> Data;
+    public static String PasswordCNProp = "Password";
+    public ArrayList<DataDTO> Data;
     public UserTypeDTO UserType;
-    public List<UserDTO> User1;
-    public List<UserDTO> User2;
+    public ArrayList<UserDTO> User1;
+    public ArrayList<UserDTO> User2;
 
     public UserDTO() {
     }
@@ -91,43 +98,6 @@ public class UserDTO implements KvmSerializable {
             default:
                 break;
         }
-    }
-
-    public PropertyInfo getPropertyInfo(int index) {
-        PropertyInfo info = new PropertyInfo();
-        switch (index) {
-            case 0:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "Id";
-                break;
-            case 1:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "IdUserType";
-                break;
-            case 2:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "UserName";
-                break;
-            case 3:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "FirstName";
-                break;
-            case 4:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "LastName";
-                break;
-            case 5:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "MiddleName";
-                break;
-            case 6:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "Password";
-                break;
-            default:
-                break;
-        }
-        return info;
     }
 
     public void setProperty(int index, Object value) {

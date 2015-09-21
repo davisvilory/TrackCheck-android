@@ -9,14 +9,17 @@ import java.util.Hashtable;
 
 public class DataPhotoDTO implements KvmSerializable {
     public int Id;
+    public static String IdCNProp = "Id";
     public int IdData;
+    public static String IdDataCNProp = "IdData";
     public String Photo = "";
+    public static String PhotoCNProp = "Photo";
     public DataDTO Data;
 
-    /***
-     * Custom
-     ***/
+    /*Custom*/
     public Bitmap bitmap;
+    public int IdServer;
+    public static String IdServerCNProp = "IdServer";
 
     public DataPhotoDTO() {
     }
@@ -27,15 +30,6 @@ public class DataPhotoDTO implements KvmSerializable {
 
     public String getInnerText() {
         return "";
-    }
-
-    public DataPhotoDTO(
-            int id,
-            int iddata,
-            String photo) {
-        Id = id;
-        IdData = iddata;
-        Photo = photo;
     }
 
     public int getPropertyCount() {
@@ -74,27 +68,6 @@ public class DataPhotoDTO implements KvmSerializable {
             default:
                 break;
         }
-    }
-
-    public PropertyInfo getPropertyInfo(int index) {
-        PropertyInfo info = new PropertyInfo();
-        switch (index) {
-            case 0:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "Id";
-                break;
-            case 1:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "IdData";
-                break;
-            case 2:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "Photo";
-                break;
-            default:
-                break;
-        }
-        return info;
     }
 
     public void setProperty(int index, Object value) {
