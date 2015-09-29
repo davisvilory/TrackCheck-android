@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import beteam.viloco.trackcheck.R;
 import beteam.viloco.trackcheck.activity.BaseClass;
@@ -32,6 +33,7 @@ public class FragmentDrawer extends Fragment {
     private View containerView;
     private List<ModulosDTO> modulosDTOs = null;
     private FragmentDrawerListener drawerListener;
+    Context mContext;
 
     public FragmentDrawer() {
     }
@@ -43,15 +45,16 @@ public class FragmentDrawer extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new CatalogoServicio(getContext());
+        mContext = getContext();
+        new CatalogoServicio(mContext);
 
         try {
             modulosDTOs = CatalogoServicio.getInstance().GetModules();
         } catch (CustomException ex) {
-            BaseClass.ToastAlert(ex.getMessage(), getContext());
+            BaseClass.ToastAlert(ex.getMessage(), mContext);
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, getContext());
-            BaseClass.ToastAlert("Error interno de sistema", getContext());
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert("Error interno de sistema", mContext);
         }
     }
 
@@ -59,6 +62,7 @@ public class FragmentDrawer extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflating view layout
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+
         RecyclerView recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
 
         adapter = new NavigationDrawerAdapter(getActivity(), modulosDTOs);
@@ -76,6 +80,13 @@ public class FragmentDrawer extends Fragment {
             public void onLongClick(View view, int position) {
             }
         }));
+
+        try {
+            ((TextView) layout.findViewById(R.id.NavDrawer_VersionApp)).setText(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0).versionName);
+        } catch (Exception ex) {
+            LogErrorRepository.BuildLogError(ex, mContext);
+            BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
+        }
 
         return layout;
     }
@@ -120,6 +131,7 @@ public class FragmentDrawer extends Fragment {
 
     public interface ClickListener {
         void onClick(View view, int position);
+
         void onLongClick(View view, int position);
     }
 
@@ -167,7 +179,7 @@ public class FragmentDrawer extends Fragment {
         void onDrawerItemSelected(View view, int position, ModulosDTO item);
     }
 
-    public ModulosDTO getItem(int position){
+    public ModulosDTO getItem(int position) {
         return modulosDTOs.get(position);
     }
 }

@@ -85,8 +85,6 @@ public class VisitPending extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        menu.findItem(R.id.action_search).setVisible(false);
-        menu.findItem(R.id.action_settings).setVisible(false);
         menu.findItem(R.id.action_gps).setVisible(false);
         menu.findItem(R.id.action_sync).setVisible(true);
         menu.findItem(R.id.action_refresh).setVisible(false);

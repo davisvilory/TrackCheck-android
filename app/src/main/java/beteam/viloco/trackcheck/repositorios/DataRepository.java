@@ -14,6 +14,7 @@ import beteam.viloco.trackcheck.model.DatabaseHelper;
 import beteam.viloco.trackcheck.util.CustomException;
 import beteam.viloco.trackcheck.util.Extensions;
 
+import org.kobjects.isodate.IsoDate;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalDate;
 import org.ksoap2.serialization.MarshalFloat;
@@ -24,12 +25,13 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 public class DataRepository {
-    private Context context;
+    private Context mContext;
 
     public DataRepository(Context context) {
-        this.context = context;
+        this.mContext = context;
     }
 
     public DataDTO ReadFirstByPredicate(ArrayList<Predicate> predicates) throws CustomException {
@@ -44,7 +46,7 @@ public class DataRepository {
                 query += " " + predicate.Comparison + " " + predicate.Column + " = " + predicate.Value;
             }
 
-        DatabaseHelper dbHelper = new DatabaseHelper(context);
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         try {
@@ -52,15 +54,15 @@ public class DataRepository {
 
             if (cursor.moveToFirst()) {
                 do {
-                    dto = Extensions.ConvertCursorToComplexType(cursor, DataDTO.class, context);
-                    DataPhotoRepository dataPhotoRepository = new DataPhotoRepository(context);
+                    dto = Extensions.ConvertCursorToComplexType(cursor, DataDTO.class, mContext);
+                    DataPhotoRepository dataPhotoRepository = new DataPhotoRepository(mContext);
                     ArrayList<Predicate> predicatePhoto = new ArrayList<>();
                     predicatePhoto.add(new Predicate(DataPhotoDTO.IdDataCNProp, String.valueOf(dto.Id), Predicate.ComparisonPredicate.AND));
                     dto.DataPhoto = dataPhotoRepository.ReadAllByPredicate(predicatePhoto);
                 } while (cursor.moveToNext());
             }
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("Hubo un error al consultar la base");
         }
 
@@ -68,7 +70,7 @@ public class DataRepository {
     }
 
     public boolean InsertData(DataDTO dataDTO) throws CustomException {
-        DatabaseHelper dbHelper = new DatabaseHelper(context);
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         try {
@@ -115,7 +117,7 @@ public class DataRepository {
 
             db.close();
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("Hubo un error al consultar la base");
         }
 
@@ -133,7 +135,7 @@ public class DataRepository {
                 query += " " + predicate.Comparison + " " + predicate.Column + " = " + predicate.Value;
             }
 
-        DatabaseHelper dbHelper = new DatabaseHelper(context);
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         try {
@@ -141,11 +143,11 @@ public class DataRepository {
 
             if (cursor.moveToFirst()) {
                 do {
-                    list.add(Extensions.ConvertCursorToComplexType(cursor, DataDTO.class, context));
+                    list.add(Extensions.ConvertCursorToComplexType(cursor, DataDTO.class, mContext));
                 } while (cursor.moveToNext());
             }
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("Hubo un error al consultar la base");
         }
 
@@ -157,7 +159,7 @@ public class DataRepository {
 
         String query = "SELECT Count(Id) FROM " + DatabaseHelper.Data;
 
-        DatabaseHelper dbHelper = new DatabaseHelper(context);
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         try {
@@ -174,17 +176,17 @@ public class DataRepository {
 
                         if (cursor.moveToFirst()) {
                             do {
-                                list.add(Extensions.ConvertCursorToComplexType(cursor, DataDTO.class, context));
+                                list.add(Extensions.ConvertCursorToComplexType(cursor, DataDTO.class, mContext));
                             } while (cursor.moveToNext());
                         }
                     } catch (Exception ex) {
-                        LogErrorRepository.BuildLogError(ex, context);
+                        LogErrorRepository.BuildLogError(ex, mContext);
                         throw new CustomException("Hubo un error al consultar la base");
                     }
                 }
             }
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("Hubo un error al consultar la base");
         }
 
@@ -192,6 +194,8 @@ public class DataRepository {
     }
 
     public int SendDataPending(DataDTO dataDTO) throws CustomException {
+        if (!Extensions.isConnectionAvailable(mContext)) return 0;
+
         dataDTO.DataPhoto = null;
         SoapObject request = new SoapObject(Constantes.WS_TARGET_NAMESPACE, Constantes.WSMETHOD_UploadData);
         PropertyInfo info = new PropertyInfo();
@@ -205,10 +209,12 @@ public class DataRepository {
         envelope.setOutputSoapObject(request);
         envelope.addMapping(Constantes.WS_TARGET_NAMESPACE, DataDTO.class.getSimpleName(), DataDTO.class);
 
-        MarshalFloat marshalDouble = new MarshalFloat();
-        marshalDouble.register(envelope);
+        MarshalFloat marshalFloat = new MarshalFloat();
+        marshalFloat.register(envelope);
         MarshalDate md = new MarshalDate();
         md.register(envelope);
+
+        String fecha = IsoDate.dateToString(dataDTO.Date, 3);
 
         HttpTransportSE httpTransport = new HttpTransportSE(Constantes.SOAP_ADDRESS_MOBILE, 40000);
 
@@ -217,13 +223,13 @@ public class DataRepository {
 
             SoapObject response = (SoapObject) envelope.getResponse();
 
-            AjaxResponse ajaxResponse = Extensions.ConvertSoap(response, AjaxResponse.class, context);
+            AjaxResponse ajaxResponse = Extensions.ConvertSoap(response, AjaxResponse.class, mContext);
 
             if (ajaxResponse.Success) {
                 if (ajaxResponse.ReturnedObject instanceof Integer) {
                     dataDTO.IdServer = (int) ajaxResponse.ReturnedObject;
 
-                    DatabaseHelper dbHelper = new DatabaseHelper(context);
+                    DatabaseHelper dbHelper = new DatabaseHelper(mContext);
                     SQLiteDatabase db = dbHelper.getWritableDatabase();
 
                     try {
@@ -233,7 +239,7 @@ public class DataRepository {
 
                         db.close();
                     } catch (Exception ex) {
-                        LogErrorRepository.BuildLogError(ex, context);
+                        LogErrorRepository.BuildLogError(ex, mContext);
                         throw new CustomException("Hubo un error al consultar la base");
                     }
 
@@ -241,10 +247,10 @@ public class DataRepository {
                 }
             }
         } catch (SocketTimeoutException ex) {
-            LogErrorRepository.BuildLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("No se conecto con el servidor");
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("No se pudo enviar los datos");
         }
 
@@ -252,6 +258,8 @@ public class DataRepository {
     }
 
     public int SendDataPhotoPending(DataPhotoDTO dataPhotoDTO) throws CustomException {
+        if (!Extensions.isConnectionAvailable(mContext)) return 0;
+
         SoapObject request = new SoapObject(Constantes.WS_TARGET_NAMESPACE, Constantes.WSMETHOD_UploadDataPhoto);
         PropertyInfo info = new PropertyInfo();
         info.setType(dataPhotoDTO.getClass());
@@ -272,13 +280,13 @@ public class DataRepository {
 
             SoapObject response = (SoapObject) envelope.getResponse();
 
-            AjaxResponse ajaxResponse = Extensions.ConvertSoap(response, AjaxResponse.class, context);
+            AjaxResponse ajaxResponse = Extensions.ConvertSoap(response, AjaxResponse.class, mContext);
 
             if (ajaxResponse.Success) {
                 if (ajaxResponse.ReturnedObject instanceof Integer) {
                     dataPhotoDTO.IdServer = (int) ajaxResponse.ReturnedObject;
 
-                    DatabaseHelper dbHelper = new DatabaseHelper(context);
+                    DatabaseHelper dbHelper = new DatabaseHelper(mContext);
                     SQLiteDatabase db = dbHelper.getWritableDatabase();
 
                     try {
@@ -288,7 +296,7 @@ public class DataRepository {
 
                         db.close();
                     } catch (Exception ex) {
-                        LogErrorRepository.BuildLogError(ex, context);
+                        LogErrorRepository.BuildLogError(ex, mContext);
                         throw new CustomException("Hubo un error al consultar la base");
                     }
 
@@ -296,7 +304,7 @@ public class DataRepository {
                 }
             }
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("No se pudo enviar los datos");
         }
 
@@ -304,7 +312,7 @@ public class DataRepository {
     }
 
     public boolean DeleteDataAndPhoto(int Id) throws CustomException {
-        DatabaseHelper dbHelper = new DatabaseHelper(context);
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         boolean result = true;
 
@@ -332,7 +340,7 @@ public class DataRepository {
 
             db.close();
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, context);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("Hubo un error al consultar la base");
         }
 

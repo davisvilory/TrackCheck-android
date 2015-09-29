@@ -123,12 +123,11 @@ public class Login extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.master_menu, menu);
-        menu.findItem(R.id.action_search).setVisible(false);
-        menu.findItem(R.id.action_settings).setVisible(false);
         menu.findItem(R.id.action_gps).setVisible(false);
         menu.findItem(R.id.action_sync).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_getcatalogs).setVisible(false);
+        menu.findItem(R.id.action_update).setVisible(false);
         return true;
     }
 

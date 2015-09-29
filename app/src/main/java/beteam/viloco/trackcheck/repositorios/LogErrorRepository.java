@@ -1,39 +1,34 @@
 package beteam.viloco.trackcheck.repositorios;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.text.format.DateFormat;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalDate;
-import org.ksoap2.serialization.MarshalFloat;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Date;
+
 import beteam.viloco.trackcheck.R;
 import beteam.viloco.trackcheck.activity.BaseClass;
 import beteam.viloco.trackcheck.dto.AjaxResponse;
 import beteam.viloco.trackcheck.dto.Constantes;
-import beteam.viloco.trackcheck.dto.DataDTO;
 import beteam.viloco.trackcheck.dto.LogErrorDTO;
-import beteam.viloco.trackcheck.model.DatabaseHelper;
-import beteam.viloco.trackcheck.util.CustomException;
 import beteam.viloco.trackcheck.util.Extensions;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.net.SocketTimeoutException;
-import java.util.Date;
 
 public class LogErrorRepository {
     public static void BuildLogError(Exception ex, Context context) {
         LogErrorDTO error = new LogErrorDTO();
 
         try {
-            error.ErrorInterno = ex.toString();
+            error.ErrorInterno = ex.toString() + " Device: " + Build.MODEL + " " + Build.VERSION.SDK_INT + " " + Build.BRAND;
             error.ErrorResumido = ex.getMessage() == null ? "" : ex.getMessage();
             error.Fecha = new Date();
             StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
@@ -43,8 +38,6 @@ public class LogErrorRepository {
             // Guardar en la base
 
             RegistraErrorTXT(error, context);
-
-            new Task(context, error).execute((Void) null);
         } catch (Exception e) {
             RegistraErrorTXT(error, context);
         }
@@ -58,8 +51,8 @@ public class LogErrorRepository {
                 new File(context.getFilesDir(), Constantes.LogErrorNombreArchivo);
             }
 
-            String ExceptionLog = String.format("Modulo: %s, Fecha: %s, Mensaje: %s, Exception: %s%n",
-                    error.Modulo, android.text.format.DateFormat.format("yyyy-MM-dd hh:mm:ss", error.Fecha),
+            String ExceptionLog = String.format("<logerror>Modulo: %s, Fecha: %s, Mensaje: %s, Exception: </logerror>%s%n",
+                    error.Modulo, DateFormat.format("yyyy-MM-dd hh:mm:ss", error.Fecha),
                     error.ErrorResumido.replace("'", "").replace("\"", ""),
                     error.ErrorInterno.replace("'", "").replace("\"", ""));
 
@@ -83,6 +76,8 @@ public class LogErrorRepository {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
+                if (!Extensions.isConnectionAvailable(mContext)) return false;
+
                 SoapObject request = new SoapObject(Constantes.WS_TARGET_NAMESPACE, Constantes.WSMETHOD_LogError);
                 PropertyInfo info = new PropertyInfo();
                 info.setType(mError.getClass());
@@ -110,6 +105,7 @@ public class LogErrorRepository {
                     if (ajaxResponse.Success)
                         return true;
                 } catch (Exception ex) {
+                    //No se realiza ninguna accion
                 }
 
                 return false;
@@ -120,10 +116,6 @@ public class LogErrorRepository {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            try {
-
-            } catch (Exception ex) {
-            }
         }
 
         @Override

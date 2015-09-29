@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -24,6 +25,7 @@ import beteam.viloco.trackcheck.activity.BaseClass;
 import beteam.viloco.trackcheck.activity.Login;
 import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.servicio.CatalogoServicio;
+import beteam.viloco.trackcheck.servicio.NegocioServicio;
 import beteam.viloco.trackcheck.util.CustomException;
 
 public class Home extends Fragment {
@@ -77,12 +79,11 @@ public class Home extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        menu.findItem(R.id.action_search).setVisible(false);
-        menu.findItem(R.id.action_settings).setVisible(false);
         menu.findItem(R.id.action_gps).setVisible(false);
         menu.findItem(R.id.action_sync).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_getcatalogs).setVisible(true);
+        menu.findItem(R.id.action_update).setVisible(true);
     }
 
     @Override
@@ -111,6 +112,9 @@ public class Home extends Fragment {
                     DoAction(1);
                     DoAction(2);
                     DoAction(3);
+                    return true;
+                case R.id.action_update:
+                    DoAction(4);
                     return true;
             }
         } catch (Exception ex) {
@@ -162,6 +166,8 @@ public class Home extends Fragment {
             if (action == 1) message = "Obteniendo catalogo de Zonas";
             else if (action == 2) message = "Obteniendo catalogo de Territorios";
             else if (action == 3) message = "Obteniendo catalogo de Tipos de Negocio";
+            else if (action == 4) message = "Verificando si hay actualizaciones";
+            else if (action == 5) message = "Obteniendo la ultima versión";
             BaseClass.ToastAlert(message, mContext);
             showProgress(true);
             mTask = new Task(action);
@@ -187,6 +193,15 @@ public class Home extends Fragment {
                     CatalogoServicio.getInstance().GetTerritories();
                 } else if (accion == 3) {
                     CatalogoServicio.getInstance().GetBusinessTypes();
+                } else if (accion == 4) {
+                    if (NegocioServicio.getInstance().ExistsUpdate())
+                        return true;
+                    else {
+                        message = "Ya tiene la ultima versión disponible";
+                        return false;
+                    }
+                } else if (accion == 5) {
+                    NegocioServicio.getInstance().UpdateApp();
                 }
             } catch (CustomException ex) {
                 message = ex.getMessage();
@@ -213,6 +228,8 @@ public class Home extends Fragment {
                         BaseClass.ToastAlert("Territorios obtenidos exitosamente", mContext);
                     } else if (accion == 3) {
                         BaseClass.ToastAlert("Tipos de Negocios obtenidos exitosamente", mContext);
+                    } else if (accion == 4) {
+                        DoAction(5);
                     }
                 } else {
                     BaseClass.ToastAlert(message, mContext);

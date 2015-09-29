@@ -17,12 +17,12 @@
         android:textColor="@color/white"
         android:visibility="gone" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/HomeForm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

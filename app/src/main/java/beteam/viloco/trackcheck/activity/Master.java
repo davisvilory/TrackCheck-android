@@ -45,12 +45,12 @@ public class Master extends AppCompatActivity implements FragmentDrawer.Fragment
             setSupportActionBar(mToolbar);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+            FragmentManager fragmentManager = getSupportFragmentManager();
             DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+            drawerFragment = (FragmentDrawer) fragmentManager.findFragmentById(R.id.fragment_navigation_drawer);
             drawerFragment.setUp(R.id.fragment_navigation_drawer, mDrawerLayout, mToolbar);
             drawerFragment.setDrawerListener(this);
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
                 public void onBackStackChanged() {
                     int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
@@ -75,12 +75,11 @@ public class Master extends AppCompatActivity implements FragmentDrawer.Fragment
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.master_menu, menu);
-        menu.findItem(R.id.action_search).setVisible(false);
-        menu.findItem(R.id.action_settings).setVisible(false);
         menu.findItem(R.id.action_gps).setVisible(false);
         menu.findItem(R.id.action_sync).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(false);
         menu.findItem(R.id.action_getcatalogs).setVisible(false);
+        menu.findItem(R.id.action_update).setVisible(false);
         return true;
     }
 

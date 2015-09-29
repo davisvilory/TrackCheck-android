@@ -131,10 +131,10 @@ public class BaseClass extends Activity {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
         // Setting Dialog Title
-        alertDialog.setTitle("Habilitar Internet");
+        alertDialog.setTitle("Servicio de ubicación");
 
         // Setting Dialog Message
-        alertDialog.setMessage("El Internet no esta habilitado. Por favor habilite el Internet por 3G o Wifi");
+        alertDialog.setMessage("El GPS o el internet no esta habilitado. Por favor habilite uno de los dos para obtener su ubicación");
 
         // On pressing Settings button
         alertDialog.setPositiveButton("Wifi", new DialogInterface.OnClickListener() {

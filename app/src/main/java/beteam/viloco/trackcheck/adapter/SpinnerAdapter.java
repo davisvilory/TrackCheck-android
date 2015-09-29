@@ -36,6 +36,11 @@ public class SpinnerAdapter extends BaseAdapter {
         return position;
     }
 
+    public void setError(View v, CharSequence s) {
+        TextView textView = (TextView) v.findViewById(R.id.SpinnerTemplateDescription);
+        textView.setError(s);
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View template;

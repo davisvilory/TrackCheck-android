@@ -58,6 +58,8 @@ public class ZoneRepository {
 
     @SuppressWarnings("unchecked")
     public boolean GetZones() throws CustomException {
+        if (!Extensions.isConnectionAvailable(mContext)) return false;
+
         SoapObject request = new SoapObject(Constantes.WS_TARGET_NAMESPACE, Constantes.WSMETHOD_GetZones);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -81,7 +83,7 @@ public class ZoneRepository {
                 }
             }
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, this.mContext);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("No se pudo obtener el catalogo de Zonas");
         }
 
@@ -89,6 +91,7 @@ public class ZoneRepository {
     }
 
     public boolean InsertZones(ArrayList<ZoneDTO> dtos) throws CustomException {
+        DeleteAll();
         DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -125,6 +128,22 @@ public class ZoneRepository {
                 result = cursor.getInt(0) > 0;
             }
 
+            db.close();
+        } catch (Exception ex) {
+            LogErrorRepository.BuildLogError(ex, mContext);
+            throw new CustomException("Hubo un error al consultar la base");
+        }
+
+        return result;
+    }
+
+    public boolean DeleteAll() throws CustomException {
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        boolean result = false;
+
+        try {
+            db.delete(DatabaseHelper.Zone, null, null);
             db.close();
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, mContext);

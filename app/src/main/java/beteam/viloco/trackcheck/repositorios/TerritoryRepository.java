@@ -58,6 +58,8 @@ public class TerritoryRepository {
 
     @SuppressWarnings("unchecked")
     public boolean GetTerritories() throws CustomException {
+        if (!Extensions.isConnectionAvailable(mContext)) return false;
+
         SoapObject request = new SoapObject(Constantes.WS_TARGET_NAMESPACE, Constantes.WSMETHOD_GetTerritories);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -81,7 +83,7 @@ public class TerritoryRepository {
                 }
             }
         } catch (Exception ex) {
-            LogErrorRepository.BuildLogError(ex, this.mContext);
+            LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("No se pudo obtener el catalogo de Territorios");
         }
 
@@ -89,6 +91,7 @@ public class TerritoryRepository {
     }
 
     public boolean InsertTerritories(ArrayList<TerritoryDTO> dtos) throws CustomException {
+        DeleteAll();
         DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -125,6 +128,22 @@ public class TerritoryRepository {
                 result = cursor.getInt(0) > 0;
             }
 
+            db.close();
+        } catch (Exception ex) {
+            LogErrorRepository.BuildLogError(ex, mContext);
+            throw new CustomException("Hubo un error al consultar la base");
+        }
+
+        return result;
+    }
+
+    public boolean DeleteAll() throws CustomException {
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        boolean result = false;
+
+        try {
+            db.delete(DatabaseHelper.Territory, null, null);
             db.close();
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, mContext);

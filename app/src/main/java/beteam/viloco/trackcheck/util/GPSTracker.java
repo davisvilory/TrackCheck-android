@@ -41,43 +41,43 @@ public class GPSTracker extends Service implements LocationListener {
         try {
             locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
-            Criteria criteria = new Criteria();
-            criteria.setPowerRequirement(Criteria.NO_REQUIREMENT); // Chose your desired power consumption level.
-            criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
-            criteria.setSpeedRequired(true); // Chose if speed for first location fix is required.
-            criteria.setAltitudeRequired(false); // Choose if you use altitude.
-            criteria.setBearingRequired(false); // Choose if you use bearing.
-            criteria.setCostAllowed(false); // Choose if this provider can waste money :-)
-
-            String proname = locationManager.getBestProvider(criteria, true);
+//            Criteria criteria = new Criteria();
+//            criteria.setPowerRequirement(Criteria.NO_REQUIREMENT); // Chose your desired power consumption level.
+//            criteria.setAccuracy(Criteria.ACCURACY_FINE); // Choose your accuracy requirement.
+//            criteria.setSpeedRequired(true); // Chose if speed for first location fix is required.
+//            criteria.setAltitudeRequired(false); // Choose if you use altitude.
+//            criteria.setBearingRequired(false); // Choose if you use bearing.
+//            criteria.setCostAllowed(false); // Choose if this provider can waste money :-)
+//
+//            String proname = locationManager.getBestProvider(criteria, true);
             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
             if (!isGPSEnabled && !isNetworkEnabled) {
                 // no network provider is enabled
             } else {
-//                if (isNetworkEnabled) {
-//                    locationManager.requestLocationUpdates(proname, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-//                    if (locationManager != null) {
-//                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//                        if (location != null) {
-//                            latitude = location.getLatitude();
-//                            longitude = location.getLongitude();
-//                            canGetLocation = true;
-//                        }
-//                    }
-//                }
-//                if (isGPSEnabled) {
-                    locationManager.requestLocationUpdates(proname, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                if (isNetworkEnabled) {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                     if (locationManager != null) {
-                        location = locationManager.getLastKnownLocation(proname);
+                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         if (location != null) {
                             latitude = location.getLatitude();
                             longitude = location.getLongitude();
                             canGetLocation = true;
                         }
                     }
-//                }
+                }
+                if (isGPSEnabled) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    if (locationManager != null) {
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (location != null) {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
+                            canGetLocation = true;
+                        }
+                    }
+                }
             }
         } catch (SecurityException ex) {
             LogErrorRepository.BuildLogError(ex, mContext);
