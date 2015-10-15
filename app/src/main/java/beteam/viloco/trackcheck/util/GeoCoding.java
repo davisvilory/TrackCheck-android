@@ -92,7 +92,7 @@ public class GeoCoding extends AsyncTask<Void, Void, Address> {
     @Override
     protected Address doInBackground(Void... params) {
         try {
-            String URL = String.format(new Locale("es", "MX"), "http://maps.googleapis.com/maps/api/geocode/json?latlng=%1$f,%2$f&sensor=false&language=" + Locale.getDefault().getCountry(), latitude, longitude);
+            String URL = String.format(new Locale("es", "MX"), "http://maps.googleapis.com/maps/api/geocode/json?latlng=%1$f,%2$f&sensor=true&language=" + new Locale("es", "MX").getCountry(), latitude, longitude);
 
             URL url = new URL(URL);
             connection = (HttpURLConnection) url.openConnection();

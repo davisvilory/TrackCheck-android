@@ -61,8 +61,10 @@ public class NegocioServicio {
             envelope.dotNet = true;
             envelope.setOutputSoapObject(request);
 
+            System.setProperty("http.keepAlive", "false");
             HttpTransportSE httpTransport = new HttpTransportSE(Constantes.SOAP_ADDRESS_MOBILE, 40000);
 
+            httpTransport.reset();
             httpTransport.call(Constantes.WS_TARGET_NAMESPACE + Constantes.WSMETHOD_ExistsUpdate, envelope);
 
             SoapObject response = (SoapObject) envelope.getResponse();

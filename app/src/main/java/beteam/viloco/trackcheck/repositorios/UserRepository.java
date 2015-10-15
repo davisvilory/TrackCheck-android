@@ -41,6 +41,7 @@ public class UserRepository {
         envelope.setOutputSoapObject(request);
         envelope.addMapping(Constantes.WS_TARGET_NAMESPACE, UserDTO.class.getSimpleName(), UserDTO.class);
 
+        System.setProperty("http.keepAlive", "false");
         HttpTransportSE httpTransport = new HttpTransportSE(Constantes.SOAP_ADDRESS_MOBILE, 40000);
 
         try {
@@ -54,6 +55,9 @@ public class UserRepository {
             if (ajaxResponse.Success)
                 if (ajaxResponse.ReturnedObject instanceof UserDTO)
                     user = (UserDTO) ajaxResponse.ReturnedObject;
+
+            httpTransport.reset();
+            httpTransport.getServiceConnection().disconnect();
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, context);
             throw new CustomException("No se pudo autenticar al usuario");

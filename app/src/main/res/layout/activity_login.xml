@@ -17,6 +17,7 @@
     </LinearLayout>
 
     <ScrollView
+        android:id="@+id/Login_Scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/container_toolbar">
@@ -110,13 +111,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_height="match_parent"
+        android:gravity="bottom">
 
         <ImageView
             android:id="@+id/Login_Logo2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:layout_centerInParent="true"
             android:contentDescription="@string/Login_Logo_Descripcion"
             android:scaleType="fitCenter"

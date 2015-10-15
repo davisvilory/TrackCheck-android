@@ -1,8 +1,8 @@
 package beteam.viloco.trackcheck.servicio;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.Base64;
+
+import java.util.ArrayList;
 
 import beteam.viloco.trackcheck.dto.BusinessTypeDTO;
 import beteam.viloco.trackcheck.dto.DataDTO;
@@ -13,13 +13,11 @@ import beteam.viloco.trackcheck.dto.UserDTO;
 import beteam.viloco.trackcheck.dto.ZoneDTO;
 import beteam.viloco.trackcheck.repositorios.BusinessTypeRepository;
 import beteam.viloco.trackcheck.repositorios.DataRepository;
+import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.repositorios.TerritoryRepository;
 import beteam.viloco.trackcheck.repositorios.UserRepository;
 import beteam.viloco.trackcheck.repositorios.ZoneRepository;
 import beteam.viloco.trackcheck.util.CustomException;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 
 public class CatalogoServicio {
     private static Context mContext;
@@ -76,19 +74,12 @@ public class CatalogoServicio {
     /*Data*/
     public boolean InsertaData(DataDTO dataDTO) throws CustomException {
         DataRepository repo = new DataRepository(mContext);
-
-        for (int i = 0; i < dataDTO.DataPhoto.size(); i++) {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            dataDTO.DataPhoto.get(i).bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            dataDTO.DataPhoto.get(i).Photo = Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP);
-        }
-
         return repo.InsertData(dataDTO);
     }
 
-    public ArrayList<DataDTO> GetDataPending() throws CustomException {
+    public ArrayList<DataDTO> GetDataPending(int IdUser) throws CustomException {
         DataRepository repo = new DataRepository(mContext);
-        return repo.GetDataPending();
+        return repo.GetDataPending(IdUser);
     }
 
     public int SendDataPending(DataDTO dataDTO) throws CustomException {
@@ -157,5 +148,11 @@ public class CatalogoServicio {
     public boolean GetBusinessTypes() throws CustomException {
         BusinessTypeRepository repo = new BusinessTypeRepository(mContext);
         return repo.GetBusinessTypes();
+    }
+
+    /*LogError*/
+    public boolean SendLogError() throws CustomException {
+        LogErrorRepository repo = new LogErrorRepository(mContext);
+        return repo.SendLogError();
     }
 }

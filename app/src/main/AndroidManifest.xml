@@ -19,6 +19,7 @@
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/Nombre_Aplicacion"
+        android:supportsRtl="false"
         android:theme="@style/MyMaterialTheme">
         <activity
             android:name="beteam.viloco.trackcheck.activity.Splash"

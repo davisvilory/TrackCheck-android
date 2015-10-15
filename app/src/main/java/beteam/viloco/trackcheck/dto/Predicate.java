@@ -3,21 +3,16 @@ package beteam.viloco.trackcheck.dto;
 public class Predicate {
     public String Column;
     public String Value;
-    public ComparisonPredicate Comparison;
+    public String Comparison;
 
-    public Predicate(String column, String value, ComparisonPredicate comparison) {
+    public Predicate(String column, String value, String comparison) {
         Column = column;
         Value = value;
         Comparison = comparison;
     }
 
-    public enum ComparisonPredicate {
-        AND(1), OR(2);
-
-        public int value;
-
-        ComparisonPredicate(int value) {
-            this.value = value;
-        }
+    public static class ComparisonPredicate {
+        public static String AND = "AND";
+        public static String OR = "OR";
     }
 }

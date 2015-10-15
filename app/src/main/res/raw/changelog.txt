@@ -1,0 +1,88 @@
+<html>
+  <head>
+    <style type='text/css'>
+      a            { color:#a0a0e0 }
+      div.title    {
+        color:#C0F0C0;
+        font-size:1.2em;
+        font-weight:bold;
+        margin-top:1em;
+        margin-bottom:0.5em;
+        text-align:center }
+      div.subtitle {
+        color:#C0F0C0;
+        font-size:0.8em;
+        margin-bottom:1em;
+        text-align:center }
+      div.freetext { color:#F0F0F0 }
+      div.list     { color:#C0C0F0 }
+    </style>
+  </head>
+  <body>
+    $ 3.1.7
+      % Version 3.1.7
+      _ 2015-10-08
+      * Verificación de ultima versión de la app al sincronizar
+      * Bug fixes
+    $ END_OF_CHANGE_LOG
+    $ 3.1.5
+      % Version 3.1.5
+      _ 2015-10-04
+      * Se incluyo Historial de cambios al dar click en la versión del menú izquierdo
+      * Bug fixes
+    $ 3.1
+      % Version 3.1
+      _ 2015-09-30
+      * Se optimizo la memoria para soportar más fotos en una visita
+      * Se incluyo el numeró de la versión en el menu izquierdo
+      * Se incluyo botón de actualización de versión en la pantalla de inicio
+      * Bug fixes
+    $ 3.0.5
+      % Version 3.0.5
+      _ 2015-09-28
+      * Bug fixes
+      * Mejor soporte en más dispositivos
+    $ 3.0.1
+      % Version 3.0.1
+      _ 2015-09-26
+      * Cierre de sesión
+      * Actualización de catalogos con el icono en la pantalla de inicio
+      * Logos mas chicos
+      * Mensajes en la app más entendibles
+      * Se arreglo el error al querer capturar una visita
+      * Se mejoro los combos de Tipo de negocio, Territorio y Zona, para mostrar si no se selecciona
+      * Al sincronizar, se avisa del progreso
+    $ 2.1
+      % Version 2.1
+      _ 2015-09-20
+      * Bug fixes al sincronizar
+      * Bug fixes al obtener la ubicación
+      * Soporte para Android 2.2
+      * Soporte para dispositivos de menor densidad y resolucion de imagenes
+    $ 2.0
+      % Version 2.0
+      _ 2015-09-12
+      * Bug fixes en Registrar Visita
+      * Sincronizacipon contra servidor
+      * Borrado de visitas al sincronizar
+      * Pantalla de Inicio
+      * Splash al comienzo de la aplicación
+      * Iconos de acciones en cada pantalla
+    $ 1.5
+      % Version 1.5
+      _ 2015-09-08
+      * Validaciones en Login
+      * Fondo de pantalla
+      * Logos
+    $ 1.0
+      % Version 1.0
+      _ 2015-09-05
+      * Login
+      * Registrar Visitas
+      * Sincronización (demo)
+      * Menu izquierdo
+    $ 0.1
+      % Version 0.1
+      _ (beta, demo)
+  </body>
+</html>

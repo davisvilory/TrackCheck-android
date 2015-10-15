@@ -3,15 +3,13 @@
 
     <color name="transparentBlack">#95000000</color>
     <color name="white">#dddddd</color>
-    <color name="black">#000000</color>
     <color name="pearl">#cccccc</color>
     <color name="red">#eb1c2d</color>
+    <color name="bluedark">#0099cc</color>
 
     <color name="colorPrimary">#333333</color>
     <color name="colorPrimaryDark">#111111</color>
     <color name="textColorPrimary">#FFFFFF</color>
-    <color name="windowBackground">#FFFFFF</color>
-    <color name="navigationBarColor">#000000</color>
     <color name="colorAccent">#00994c</color>
 
 </resources>

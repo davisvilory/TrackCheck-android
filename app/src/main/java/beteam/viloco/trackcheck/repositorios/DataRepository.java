@@ -25,7 +25,6 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.TimeZone;
 
 public class DataRepository {
     private Context mContext;
@@ -116,6 +115,7 @@ public class DataRepository {
             }
 
             db.close();
+            dbHelper.close();
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("Hubo un error al consultar la base");
@@ -154,10 +154,10 @@ public class DataRepository {
         return list;
     }
 
-    public ArrayList<DataDTO> GetDataPending() throws CustomException {
+    public ArrayList<DataDTO> GetDataPending(int IdUser) throws CustomException {
         ArrayList<DataDTO> list = new ArrayList<>();
 
-        String query = "SELECT Count(Id) FROM " + DatabaseHelper.Data;
+        String query = "SELECT Count(Id) FROM " + DatabaseHelper.Data + " WHERE " + DataDTO.IdUserCNProp + " = " + IdUser;
 
         DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -169,7 +169,8 @@ public class DataRepository {
                 if (cursor.getInt(0) > 0) {
                     query = "SELECT d.*, (SELECT Count(dp." + DataPhotoDTO.IdCNProp + ") FROM " + DatabaseHelper.DataPhoto +
                             " dp WHERE dp." + DataPhotoDTO.IdDataCNProp + " = d." + DataDTO.IdCNProp + ") " +
-                            DataDTO.DataPhotoCountCNProp + " FROM " + DatabaseHelper.Data + " d";
+                            DataDTO.DataPhotoCountCNProp + " FROM " + DatabaseHelper.Data + " d" +
+                            " WHERE " + DataDTO.IdUserCNProp + " = " + IdUser;
 
                     try {
                         cursor = db.rawQuery(query, null);
@@ -214,11 +215,11 @@ public class DataRepository {
         MarshalDate md = new MarshalDate();
         md.register(envelope);
 
-        String fecha = IsoDate.dateToString(dataDTO.Date, 3);
-
+        System.setProperty("http.keepAlive", "false");
         HttpTransportSE httpTransport = new HttpTransportSE(Constantes.SOAP_ADDRESS_MOBILE, 40000);
 
         try {
+            httpTransport.reset();
             httpTransport.call(Constantes.WS_TARGET_NAMESPACE + Constantes.WSMETHOD_UploadData, envelope);
 
             SoapObject response = (SoapObject) envelope.getResponse();
@@ -273,9 +274,11 @@ public class DataRepository {
         envelope.implicitTypes = true;
         envelope.addMapping(Constantes.WS_TARGET_NAMESPACE, DataPhotoDTO.class.getSimpleName(), DataPhotoDTO.class);
 
+        System.setProperty("http.keepAlive", "false");
         HttpTransportSE httpTransport = new HttpTransportSE(Constantes.SOAP_ADDRESS_MOBILE, 40000);
 
         try {
+            httpTransport.reset();
             httpTransport.call(Constantes.WS_TARGET_NAMESPACE + Constantes.WSMETHOD_UploadDataPhoto, envelope);
 
             SoapObject response = (SoapObject) envelope.getResponse();
@@ -339,6 +342,7 @@ public class DataRepository {
                 result = false;
 
             db.close();
+            cursor.close();
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("Hubo un error al consultar la base");

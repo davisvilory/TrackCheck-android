@@ -1,9 +1,5 @@
 <resources>
     <!--Menu-->
-    <string name="icon_agregar">Agregar</string>
-    <string name="icon_guardar">Guardar</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_search">Search</string>
     <string name="action_gps">GPS</string>
     <string name="action_sync">Sync</string>
     <string name="action_refresh">Refresh</string>
@@ -34,8 +30,6 @@
     <string name="FormVisitSerialNumber">Folio</string>
     <string name="FormVisitTerritory">Territorio</string>
     <string name="FormVisitZone">Zona</string>
-    <string name="FormVisitLatitud">Latitud</string>
-    <string name="FormVisitLongitud">Longitud</string>
     <string name="FormVisitStreet">Calle</string>
     <string name="FormVisitNumber">Numero</string>
     <string name="FormVisitColony">Colonia</string>
@@ -54,7 +48,6 @@
     <string name="FormVisitCaballeteVentaAceite">CaballeteVentaAceite</string>
     <string name="FormVisitLona2x1Roshpack">Lona2x1Roshpack</string>
     <string name="FormVisitLona2x1ImagenMecanico">Lona2x1ImagenMecanico</string>
-    <string name="FormVisitObservaciones">Observaciones (Opcional)</string>
     <string name="FormVisitCapturar">Cámara</string>
     <string name="FormVisitGaleria">Galería</string>
     <string name="FormVisitFotosCapturadas">Capturar evidencia</string>
@@ -63,10 +56,14 @@
     <string name="FormVisitFotosTotal">Número de fotos</string>
 
     <string name="VisitPendingNingunResultado">No hay visitas pendientes</string>
-    <string name="VisitPendingPorSincronizar">Visitas por sincronizar:</string>
+    <string name="VisitPendingPorSincronizar">Visitas por sincronizar del Usuario:</string>
 
     <!--Mensajes-->
     <string name="Mensaje_SinConeccion">Se requiere conección a Internet para actualizar</string>
     <string name="Mensaje_ErrorInterno">Error interno de sistema</string>
+    <string name="changelog_full_title">Historial de cambios</string>
+    <string name="changelog_title">Nuevos cambios</string>
+    <string name="changelog_ok_button">OK</string>
+    <string name="changelog_show_full">Historial</string>
 
 </resources>

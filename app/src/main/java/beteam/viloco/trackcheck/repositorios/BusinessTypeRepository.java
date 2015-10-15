@@ -66,6 +66,7 @@ public class BusinessTypeRepository {
         envelope.dotNet = true;
         envelope.setOutputSoapObject(request);
 
+        System.setProperty("http.keepAlive", "false");
         HttpTransportSE httpTransport = new HttpTransportSE(Constantes.SOAP_ADDRESS_MOBILE, 40000);
         boolean result = false;
 
@@ -82,6 +83,9 @@ public class BusinessTypeRepository {
                     result = InsertBusinessTypes(list);
                 }
             }
+
+            httpTransport.reset();
+            httpTransport.getServiceConnection().disconnect();
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("No se pudo obtener el catalogo de Tipos de Negocio");
@@ -129,6 +133,7 @@ public class BusinessTypeRepository {
             }
 
             db.close();
+            cursor.close();
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("Hubo un error al consultar la base");
@@ -137,10 +142,9 @@ public class BusinessTypeRepository {
         return result;
     }
 
-    public boolean DeleteAll() throws CustomException {
+    public void DeleteAll() throws CustomException {
         DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        boolean result = false;
 
         try {
             db.delete(DatabaseHelper.BusinessType, null, null);
@@ -149,7 +153,5 @@ public class BusinessTypeRepository {
             LogErrorRepository.BuildLogError(ex, mContext);
             throw new CustomException("Hubo un error al consultar la base");
         }
-
-        return result;
     }
 }

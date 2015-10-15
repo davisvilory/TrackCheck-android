@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Base64InputStream;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,10 +26,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -250,8 +258,9 @@ public class FormVisit extends Fragment {
         gps.stopUsingGPS();
         gps.getLocation();
 
-        if (!Extensions.isConnectionAvailable(mContext) && !gps.isGPSEnabled()) {
-            BaseClass.showSettingsNetworkAndGPSAlert(mContext);
+        //if (!Extensions.isConnectionAvailable(mContext) && !gps.isGPSEnabled()) {
+        if (!gps.isGPSEnabled()) {
+            gps.showSettingsGPSAlert();
             isLocationServicesActive = false;
         } else {
             if (gps.canGetLocation()) {
@@ -273,11 +282,21 @@ public class FormVisit extends Fragment {
             //((TextView) formVisit.findViewById(R.id.FormVisitLatitud)).setText(String.valueOf(dataDTO.Latitude));
             //((TextView) formVisit.findViewById(R.id.FormVisitLongitud)).setText(String.valueOf(dataDTO.Longitude));
 
-            Geocoder gcd = new Geocoder(mContext, new Locale("es", "MX"));
-            //List<Address> addresses = new ArrayList<>();
-            //addresses = gcd.getFromLocation(dataDTO.Latitude, dataDTO.Longitude, 1);
+            Address address = null;
+            try {
+                Geocoder gcd = new Geocoder(mContext, new Locale("es", "MX"));
+                List<Address> addresses = new ArrayList<>();
+                addresses = gcd.getFromLocation(dataDTO.Latitude, dataDTO.Longitude, 1);
+                if (addresses.size() > 0)
+                    address = addresses.get(0);
+            } catch (Exception ex) {
+            }
+
             GeoCoding geoCoding = new GeoCoding(dataDTO.Latitude, dataDTO.Longitude);
-            Address address = geoCoding.execute().get();
+            Address address1 = geoCoding.execute().get();
+
+            if (address1 != null)
+                address = address1;
 
             if (address != null) {
                 //if (addresses.size() > 0) {
@@ -295,6 +314,8 @@ public class FormVisit extends Fragment {
                 ((TextView) formVisit.findViewById(R.id.FormVisitDelegationTown)).setText(dataDTO.DelegationTown);
                 ((TextView) formVisit.findViewById(R.id.FormVisitState)).setText(dataDTO.State);
                 ((TextView) formVisit.findViewById(R.id.FormVisitPostalCode)).setText(dataDTO.PostalCode);
+            } else {
+                BaseClass.ToastAlert("No hay referencias de la ubicación, capture la calle manualmente.", mContext);
             }
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, mContext);
@@ -342,53 +363,68 @@ public class FormVisit extends Fragment {
         try {
             switch (requestCode) {
                 case CAMERA_REQUEST:
-                    if (resultCode == Master.RESULT_OK) {
-                        if (data == null) return;
-                        Uri selectedImage = data.getData();
-                        String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                        Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-                        cursor.moveToFirst();
-                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                        String picturePath = cursor.getString(columnIndex);
-                        cursor.close();
-                        Bitmap photo = Extensions.getScaledBitmap(picturePath, 1200, 1200);
-//                        Bitmap photo = (Bitmap) data.getExtras().get("data");
-//                        photo = Extensions.decodeFile(photo);
-//                        photo = Extensions.getScaledBitmap(photo, (int) (photo.getWidth() * 0.5), (int) (photo.getHeight() * 0.5));
-                        //ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        //photo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                        DataPhotoDTO dataPhotoDTO = new DataPhotoDTO();
-                        //dataPhotoDTO.Photo = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
-                        dataPhotoDTO.bitmap = photo;
-                        dataDTO.DataPhoto.add(dataPhotoDTO);
-                        photosAdapter.setListData(dataDTO.DataPhoto);
-                        photosAdapter.notifyDataSetChanged();
-                        listView.setExpanded(true);
-                    }
-                    break;
                 case PICK_IMAGE:
                     if (resultCode == Master.RESULT_OK) {
                         if (data == null) return;
                         Uri selectedImage = data.getData();
                         String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                        Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-                        cursor.moveToFirst();
-                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                        String picturePath = cursor.getString(columnIndex);
-                        cursor.close();
-                        Bitmap photo = Extensions.getScaledBitmap(picturePath, 1200, 1200);
-                        //photo = Extensions.decodeFile(photo);
-                        //ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        //photo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                        DataPhotoDTO dataPhotoDTO = new DataPhotoDTO();
-                        //dataPhotoDTO.Photo = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
-                        dataPhotoDTO.bitmap = photo;
-                        dataDTO.DataPhoto.add(dataPhotoDTO);
-                        photosAdapter.setListData(dataDTO.DataPhoto);
-                        photosAdapter.notifyDataSetChanged();
-                        listView.setExpanded(true);
+                        Cursor cursor = mContext.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                        String picturePath = "";
+                        if (cursor != null) {
+                            cursor.moveToFirst();
+                            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                            picturePath = cursor.getString(columnIndex);
+                            cursor.close();
+                        }
+                        if (picturePath != null && !picturePath.equalsIgnoreCase("")) {
+                            Bitmap photo = Extensions.getScaledBitmap(picturePath, 400, 400);
+                            //Bitmap photo = (Bitmap) data.getExtras().get("data");
+                            //photo = Extensions.decodeFile(photo);
+                            //photo = Extensions.getScaledBitmap(photo, (int) (photo.getWidth() * 0.5), (int) (photo.getHeight() * 0.5));
+                            //ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            //photo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                            DataPhotoDTO dataPhotoDTO = new DataPhotoDTO();
+                            //dataPhotoDTO.Photo = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
+                            dataPhotoDTO.bitmap = photo;
+                            dataPhotoDTO.Photo = picturePath;
+                            dataDTO.DataPhoto.add(dataPhotoDTO);
+                            photosAdapter.setListData(dataDTO.DataPhoto);
+                            photosAdapter.notifyDataSetChanged();
+                            listView.setExpanded(true);
+                            listView.requestFocus();
+                        } else {
+                            BaseClass.ToastAlert("No se pudo obtener la imagen", mContext);
+                        }
                     }
                     break;
+//                    if (resultCode == Master.RESULT_OK) {
+//                        if (data == null) return;
+//                        Uri selectedImage = data.getData();
+//                        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+//                        Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+//                        String picturePath = "";
+//                        if (cursor != null) {
+//                            cursor.moveToFirst();
+//                            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                            picturePath = cursor.getString(columnIndex);
+//                            cursor.close();
+//                        }
+//                        if (!picturePath.equalsIgnoreCase("")) {
+//                            Bitmap photo = Extensions.getScaledBitmap(picturePath, 300, 300);
+//                            //photo = Extensions.decodeFile(photo);
+//                            //ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                            //photo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+//                            DataPhotoDTO dataPhotoDTO = new DataPhotoDTO();
+//                            //dataPhotoDTO.Photo = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
+//                            //dataPhotoDTO.bitmap = photo;
+//                            dataPhotoDTO.Photo = picturePath;
+//                            dataDTO.DataPhoto.add(dataPhotoDTO);
+//                            photosAdapter.setListData(dataDTO.DataPhoto);
+//                            photosAdapter.notifyDataSetChanged();
+//                            listView.setExpanded(true);
+//                        }
+//                    }
+//                    break;
             }
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, mContext);
@@ -559,7 +595,7 @@ public class FormVisit extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         showProgress(true);
-                        task = new Task(dataDTO);
+                        task = new Task();
                         task.execute((Void) null);
                     }
                 }, mContext);
@@ -627,16 +663,31 @@ public class FormVisit extends Fragment {
 
     public class Task extends AsyncTask<Void, Void, Boolean> {
         boolean enviado;
-        DataDTO dataDTO;
         String message;
 
-        Task(DataDTO dataDTO) {
-            this.dataDTO = dataDTO;
+        Task() {
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
+                final int size = dataDTO.DataPhoto.size();
+                for (int i = 0; i < size; i++) {
+//                    final FileOutputStream fos = new FileOutputStream(dataDTO.DataPhoto.get(i).Photo);
+//                    Extensions.getScaledBitmap(dataDTO.DataPhoto.get(i).Photo, 1000, 1000).compress(Bitmap.CompressFormat.PNG, 100, fos);
+//                    fos.close();
+//                    final InputStream is = new Base64InputStream( new FileInputStream(yourFileHere) );
+//
+//                    final StringWriter writer = new StringWriter();
+//                    IOUtils.copy(is , writer, encoding);
+//                    final String yourBase64String = writer.toString();
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    //dataDTO.DataPhoto.get(i).bitmap = Extensions.getScaledBitmap(dataDTO.DataPhoto.get(i).Photo, 1000, 1000);
+                    dataDTO.DataPhoto.get(i).bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    dataDTO.DataPhoto.get(i).Photo = Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP);
+                    stream.flush();
+                    stream.close();
+                }
                 enviado = CatalogoServicio.getInstance().InsertaData(dataDTO);
             } catch (CustomException ex) {
                 message = ex.getMessage();

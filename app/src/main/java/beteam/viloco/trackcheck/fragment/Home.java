@@ -26,6 +26,7 @@ import beteam.viloco.trackcheck.activity.Login;
 import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.servicio.CatalogoServicio;
 import beteam.viloco.trackcheck.servicio.NegocioServicio;
+import beteam.viloco.trackcheck.util.ChangeLog;
 import beteam.viloco.trackcheck.util.CustomException;
 
 public class Home extends Fragment {
@@ -65,6 +66,10 @@ public class Home extends Fragment {
             if (!CatalogoServicio.getInstance().ExistsBusinessTypes()) {
                 DoAction(3);
             }
+
+            ChangeLog cl = new ChangeLog(mContext);
+            if (cl.firstRun())
+                cl.getLogDialog().show();
         } catch (CustomException ex) {
             BaseClass.ToastAlert(ex.getMessage(), mContext);
         } catch (Exception ex) {

@@ -22,12 +22,12 @@ import beteam.viloco.trackcheck.adapter.NavigationDrawerAdapter;
 import beteam.viloco.trackcheck.dto.ModulosDTO;
 import beteam.viloco.trackcheck.repositorios.LogErrorRepository;
 import beteam.viloco.trackcheck.servicio.CatalogoServicio;
+import beteam.viloco.trackcheck.util.ChangeLog;
 import beteam.viloco.trackcheck.util.CustomException;
 
 import java.util.List;
 
 public class FragmentDrawer extends Fragment {
-    private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     public NavigationDrawerAdapter adapter;
     private View containerView;
@@ -63,26 +63,35 @@ public class FragmentDrawer extends Fragment {
         // Inflating view layout
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
-
-        adapter = new NavigationDrawerAdapter(getActivity(), modulosDTOs);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                ModulosDTO item = adapter.getItem(position);
-                drawerListener.onDrawerItemSelected(view, position, item);
-                mDrawerLayout.closeDrawer(containerView);
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-            }
-        }));
-
         try {
-            ((TextView) layout.findViewById(R.id.NavDrawer_VersionApp)).setText(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0).versionName);
+            RecyclerView recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
+
+            adapter = new NavigationDrawerAdapter(getActivity(), modulosDTOs);
+            recyclerView.setAdapter(adapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new ClickListener() {
+                @Override
+                public void onClick(View view, int position) {
+                    ModulosDTO item = adapter.getItem(position);
+                    drawerListener.onDrawerItemSelected(view, position, item);
+                    mDrawerLayout.closeDrawer(containerView);
+                }
+
+                @Override
+                public void onLongClick(View view, int position) {
+                }
+            }));
+
+            TextView version = (TextView) layout.findViewById(R.id.NavDrawer_VersionApp);
+            version.setText(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0).versionName);
+            version.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ChangeLog cl = new ChangeLog(mContext);
+                    cl.getLogDialog().show();
+                    mDrawerLayout.closeDrawer(containerView);
+                }
+            });
         } catch (Exception ex) {
             LogErrorRepository.BuildLogError(ex, mContext);
             BaseClass.ToastAlert(getString(R.string.Mensaje_ErrorInterno), mContext);
@@ -94,7 +103,7 @@ public class FragmentDrawer extends Fragment {
     public void setUp(int fragmentId, DrawerLayout drawerLayout, final Toolbar toolbar) {
         containerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
-        mDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
+        final ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
@@ -151,7 +160,7 @@ public class FragmentDrawer extends Fragment {
                 public void onLongPress(MotionEvent e) {
                     View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
                     if (child != null && clickListener != null) {
-                        clickListener.onLongClick(child, recyclerView.getChildPosition(child));
+                        clickListener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
                     }
                 }
             });
@@ -161,7 +170,7 @@ public class FragmentDrawer extends Fragment {
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
             View child = rv.findChildViewUnder(e.getX(), e.getY());
             if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
-                clickListener.onClick(child, rv.getChildPosition(child));
+                clickListener.onClick(child, rv.getChildAdapterPosition(child));
             }
             return false;
         }
